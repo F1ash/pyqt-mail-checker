@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Mail Checker
+GenericName=Multiprotocol Mail Agent
+Type=Application
+Categories=Network;Email;Qt;
+Icon=mailChecker.png
+Exec=pyqt-mail-checker.py
+Terminal=false
+StartupNotify=true

@@ -1,0 +1,33 @@
+# LANG=en_US.UTF-8
+
+Paths and files:
+	Error log file: $HOME/.xsession-errors
+	Debug log file: /tmp/outMailChecker_%Y_%m_%d_%H:%S.log
+	Configuration file: $HOME/.config/plasmaMailChecker/plasmaMailChecker.conf
+	Filter files: $HOME/.config/plasmaMailChecker/filter.from,
+		$HOME/.config/plasmaMailChecker/filter.subj
+
+Path for your POP3 accounts uidl cache:
+		$HOME/.cache/plasmaMailChecker/<accountName>.cache
+	temporary cache:
+		/dev/shm/<accountName>.cache
+
+Start/stop mail checking in plasmoid.
+	Click on mailers icon to start or stop checking.
+M@ilChecker uses default wallet or an alternative, if specified.
+
+Description:
+	Applet should periodic check for new messages in configured accounts.
+	Supported protocols: POP3/POP3S/IMAP4/IMAP4S + IMAP4_IDLE.
+	Passwords for accounts stored in encrypted container.
+	Support integrated mail viewer (for non-Akonadi accounts).
+	See for : EXAMPLES.
+Notes:
+	In Applet built Translator with autodetect of locale. Installation
+	new language simply by adding the appropriate *.qm file.
+	(For example: ru.qm, de.qm, ge.qm). By default, the language is English.
+
+Known issues:
+	If you internet connection is too slow, you need increase time value in "Autoexit of connect" parameter.
+
+Tested Fedora18
