@@ -133,8 +133,9 @@ class MainWindow(QWidget):
 		self.titleLayout = QHBoxLayout()
 
 		self.icon = QPushButton()
+		self.icon.setMaximumSize(36,36)
+		self.icon.setIconSize(self.getIconActualSize("mailChecker"))
 		self.icon.setIcon(QIcon.fromTheme("mailChecker"))
-		self.icon.setMaximumSize(35.0, 35.0)
 		self.icon.setToolTip(self.headerPref + \
 							self.tr._translate('Click for Start\Stop') + \
 							self.headerSuff)
@@ -411,6 +412,10 @@ class MainWindow(QWidget):
 		self.setTrayVisibilityActionIcon(self.trayVisiblityAction)
 		self.setTrayVisibilityActionIcon(self.trayMessagesAction)
 
+	def getIconActualSize(self, theme=''):
+		icon = QIcon.fromTheme(theme)
+		return icon.actualSize(QSize(36, 36))
+
 	def autoHide(self, i = 0):
 		if i : QTimer.singleShot(1000*i, self.hide)
 
@@ -460,6 +465,7 @@ class MainWindow(QWidget):
 			self.accountCommand[accountName] = self.initValue('CommandLine', ' ')
 			self.Settings.endGroup()
 		timeOut = self.initValue('TimeOut', '600')
+		self.msgLifeTime = int(self.initValue('MsgLifeTime', '30'))
 		self.waitThread = self.initValue('WaitThread', '120')
 		self.maxShowedMail = int(self.initValue('MaxShowedMail', '1024'))
 		self.mailsInGroup = int(self.initValue('MailsInGroup', '5'))
@@ -475,7 +481,7 @@ class MainWindow(QWidget):
 		jobID = randomString(12)
 		if len(id_of_new_Items) :
 			self.MailProgExecList[jobID] = MailProgExec(self, id_of_new_Items, command, self)
-		self.MessageStackWidget.newMessage(str_, jobID, 30)
+		self.MessageStackWidget.newMessage(str_, jobID, self.msgLifeTime)
 		self.MessageStackWidget._show()
 		self.MessageStackWidget.move(self.mapToGlobal(self.trayIconMenu.pos()))
 
@@ -503,11 +509,13 @@ class MainWindow(QWidget):
 		print dateStamp() , '_refresh'
 		if self.initStat :
 			self.labelStat.setText("<font color=green><b>" + self.tr._translate('..running..') + "</b></font>")
+			self.icon.setIconSize(self.getIconActualSize("mailChecker_web"))
 			self.icon.setIcon(QIcon.fromTheme("mailChecker_web"))
 			self.icon.setToolTip(self.headerPref + self.tr._translate('Mail\nChecking') +  self.headerSuff)
 			self.disableIconClick()
 		else:
 			self.labelStat.setText("<font color=red><b>" + self.tr._translate('..stopped..') + "</b></font>")
+			self.icon.setIconSize(self.getIconActualSize("mailChecker_web"))
 			self.icon.setIcon(QIcon.fromTheme("mailChecker_stop"))
 			return None
 
@@ -575,12 +583,14 @@ class MainWindow(QWidget):
 		if self.initStat :
 			noCheck = False
 			self.labelStat.setText("<font color=green><b>" + self.tr._translate('..running..') + "</b></font>")
+			self.icon.setIconSize(self.getIconActualSize("mailChecker"))
 			self.icon.setIcon(QIcon.fromTheme("mailChecker"))
 			self.icon.setToolTip(self.headerPref + self.tr._translate('Click for Start\Stop') + \
 																				self.headerSuff)
 		else :
 			noCheck = True
 			self.labelStat.setText("<font color=red><b>" + self.tr._translate('..stopped..') + "</b></font>")
+			self.icon.setIconSize(self.getIconActualSize("mailChecker_stop"))
 			self.icon.setIcon(QIcon.fromTheme("mailChecker_stop"))
 			self.icon.setToolTip(self.headerPref + self.tr._translate('Click for Start\Stop') + \
 																				self.headerSuff)

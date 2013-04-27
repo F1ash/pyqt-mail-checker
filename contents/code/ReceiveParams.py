@@ -83,7 +83,7 @@ class ReceiveParams(QWidget):
 		self.accountCommand.setToolTip(self.tr._translate("Exec command activated in notification.\nSee for : EXAMPLES."))
 		self.accountCommand.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
 		self.accountCommand.setEditable(True)
-		templates = self.Parent.Parent.Parent.user_or_sys('contents/code/templates')
+		templates = self.Parent.Parent.Parent.user_or_sys('templates')
 		if os.path.isfile(templates) :
 			with open(templates, 'rb') as f :
 				texts = f.read().split('\n')
@@ -91,12 +91,14 @@ class ReceiveParams(QWidget):
 		else : texts = []
 		#print texts, os.getcwd(), templates
 		self.accountCommand.addItems(QStringList() << '' << texts)
+		self.Parent.Parent.Parent.Settings.beginGroup(self.item.text())
+		command = self.Parent.Parent.Parent.Settings.value("CommandLine").toString()
+		self.Parent.Parent.Parent.Settings.endGroup()
+		self.accountCommand.setEditText(command)
 		self.HB2Layout.addWidget(self.accountCommand, 2, 0, 2, 4)
 
 		self.HB3Layout = QGridLayout()
-
 		self.HB3Layout.addWidget(QLabel(self.tr._translate("Username : ")), 0, 0)
-
 		self.HB3Layout.addWidget(QLabel(self.tr._translate("Password : ")), 0, 1)
 
 		self.userNameLineEdit = QLineEdit()
