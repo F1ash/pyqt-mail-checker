@@ -30,7 +30,7 @@ global ErrorMsg
 ErrorMsg = ''
 ModuleType = type(time)
 LOCK = QMutex()
-Settings = QSettings('plasmaMailChecker','plasmaMailChecker')
+Settings = QSettings('pyqt-mail-checker','pyqt-mail-checker')
 TIMEOUT = Settings.value('timeoutSocks', 45).toUInt()[0]
 USE_PROXY = Settings.value('UseProxy', 'False').toString()
 

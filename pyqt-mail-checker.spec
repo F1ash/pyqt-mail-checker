@@ -9,7 +9,7 @@ Source0: https://github.com/F1ash/%{name}/archive/%{version}.tar.gz
 URL: https://github.com/F1ash/%{name}
 BuildArch: noarch
 
-Requires: python-SocksiPy, python-mailer, PyQt4
+Requires: python-SocksiPy, python-mailer, python-keyring, python-crypto, PyQt4
 # for building the translator`s dictionary
 BuildRequires: qt4-devel
 

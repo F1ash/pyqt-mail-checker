@@ -19,7 +19,10 @@ INSTALL=install -D -m 0644 -p
 INSTALL_EXEC=install -D -m 0755 -p
 LRELEASE=/usr/bin/lrelease-qt4
 
-build: contents/code/ru.qm
+ru.qm:
+	$(LRELEASE) $(CODE)/misc/ru.ts -qm $(CODE)/misc/ru.qm
+
+build: ru.qm
 	@echo "Nothing to build"
 
 install: build
@@ -28,7 +31,6 @@ install: build
 	# EXEC
 	$(INSTALL_EXEC) $(APP_NAME).py $(EXEC)$(APP_NAME).py
 	# SOURCE
-	$(INSTALL) EXAMPLES $(APP)EXAMPLES
 	$(INSTALL) VERSION $(APP)VERSION
 	cp -pr $(CODE)/* $(APP)
 	mkdir -p $(APP_ICONS)
@@ -36,9 +38,6 @@ install: build
 	# prepare DOCS
 	cp -p $(ICONS)/Licenses .
 	# tree $(DESTDIR)
-
-contents/code/ru.qm:
-	$(LRELEASE) $(CODE)/ru.ts -qm $(APP_CODE)ru.qm
 
 clean:
 	rm -rf $(DESKTOP)$(APP_NAME).desktop

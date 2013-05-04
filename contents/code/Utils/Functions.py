@@ -57,8 +57,8 @@ def dataToList(path_ = ''):
 	else :
 		return []
 
-FROM_filter = dataToList(os.path.expanduser('~/.config/plasmaMailChecker/filter.from'))
-SUBJ_filter = dataToList(os.path.expanduser('~/.config/plasmaMailChecker/filter.subj'))
+FROM_filter = dataToList(os.path.expanduser(os.path.join('~','.cache','pyqt-mail-checker','filter.from')))
+SUBJ_filter = dataToList(os.path.expanduser(os.path.join('~','.cache','pyqt-mail-checker','filter.subj')))
 
 def Filter(text, deprecated):
 	res = True
@@ -238,7 +238,7 @@ class Required():
 		dir_cache = os.path.expanduser('~/.cache')
 		if  not os.path.isdir(dir_cache) :
 			os.mkdir(dir_cache)
-		dir_ = os.path.expanduser('~/.cache/plasmaMailChecker')
+		dir_ = os.path.expanduser(os.path.join('~','.cache','pyqt-mail-checker'))
 		if  not os.path.isdir(dir_) :
 			os.mkdir(dir_)
 		for accountName in string.split( self.Settings.value('Accounts').toString(), ';' ):
@@ -257,7 +257,7 @@ class Required():
 
 	def savePOP3Cache(self):
 		self.LOCK.lock()
-		dir_ = os.path.expanduser('~/.cache/plasmaMailChecker')
+		dir_ = os.path.expanduser(os.path.join('~','.cache','pyqt-mail-checker'))
 		for accountName in string.split( self.Settings.value('Accounts').toString(), ';' ):
 			self.Settings.beginGroup(accountName)
 			if self.Settings.value('connectMethod').toString() == 'pop' :

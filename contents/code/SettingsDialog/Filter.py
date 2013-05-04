@@ -38,7 +38,7 @@ class Filters(QWidget):
 		self.Parent = obj
 		self.prnt = parent
 		self.tr = Translator('Filters')
-		dir_ = os.path.expanduser('~/.config/plasmaMailChecker')
+		dir_ = os.path.expanduser(os.path.join('~','.config',self.Parent.appletName))
 
 		self.filterFROM = os.path.join(dir_, 'filter.from')
 		self.filterSUBJ = os.path.join(dir_, 'filter.subj')

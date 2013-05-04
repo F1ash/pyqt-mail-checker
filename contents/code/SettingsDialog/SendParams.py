@@ -34,6 +34,7 @@ class SendParams(QWidget):
 		self.Settings = parent.Settings
 		self.item = item
 		self.appletName = self.Parent.Parent.Parent.appletName
+		self.Keyring = self.Parent.Parent.Parent.Keyring
 		self.setToolTip(self.tr._translate("Send mail"))
 		self.setMinimumWidth(48)
 
@@ -92,31 +93,22 @@ class SendParams(QWidget):
 
 	def initData(self):
 		self.Settings.beginGroup(self.item.text())
-
 		self.mailLineEdit.setText(self.Settings.value('mailAddr').toString())
-
 		if self.Settings.value('anotherAuthData', '0').toString() == '1' :
 			self.enabledBox.setCheckState(Qt.Checked)
 		else :
 			self.enabledBox.setCheckState(Qt.Unchecked)
 		self.changeAuthFieldState()
-
 		self.serverLineEdit.setText(self.Settings.value('sendServer').toString())
-
 		i = self.cryptBox.findData(self.Settings.value('sendAuthMethod', ''), flags = Qt.MatchFixedString)
 		if i>=0 : self.cryptBox.setCurrentIndex(i)
-
 		self.portBox.setValue(int(self.Settings.value('sendPort', '25').toString()))
-
 		self.userNameLineEdit.setText(self.Settings.value('sendLogin', '').toString())
-
-		if self.Parent.Parent.Parent.wallet.hasEntry(self.item.text()) and \
-			self.Parent.Parent.Parent.wallet.hasFolder(self.appletName+'_SEND') :
+		if self.Keyring.has_entry(self.item.text(), self.appletName+'_SEND') :
 			self.passwordLineEdit.setText( '***EncriptedPassWord***' )
 		else:
 			self.passwordLineEdit.setText( '***EncriptedKey_not_created***' )
 		self.passwordLineEdit.textChanged.connect(self.changePasswd)
-
 		self.Settings.endGroup()
 
 	def changePasswd(self):
@@ -138,29 +130,21 @@ class SendParams(QWidget):
 
 	def saveData(self):
 		self.Settings.beginGroup(self.item.text())
-
 		self.Settings.setValue('mailAddr', self.mailLineEdit.text())
-
 		if self.enabledBox.checkState() : value = '1'
 		else : value = '0'
 		self.Settings.setValue('anotherAuthData', value)
-
 		self.Settings.setValue('sendServer', self.serverLineEdit.text())
-
 		self.Settings.setValue('sendAuthMethod', self.cryptBox.itemData(self.cryptBox.currentIndex()))
-
 		self.Settings.setValue('sendPort', self.portBox.value())
-
 		if self.enabledBox.checkState() :
 			self.Settings.setValue('sendLogin', self.userNameLineEdit.text())
-
 			if self.passwordChanged :
-				if not self.Parent.Parent.Parent.wallet.hasFolder(self.appletName+'_SEND') :
-					self.Parent.Parent.Parent.wallet.createFolder(self.appletName+'_SEND')
-				self.Parent.Parent.Parent.wallet.setFolder(self.appletName+'_SEND')
-				self.Parent.Parent.Parent.wallet.writePassword(self.item.text(), self.passwordLineEdit.text())
+				self.Keyring.set_password(\
+					self.item.text().toLocal8Bit().data(), \
+					self.passwordLineEdit.text().toLocal8Bit().data(), \
+					self.appletName+'_SEND')
 				self.passwordLineEdit.setText( '***EncriptedPassWord***' )
-
 		self.Settings.endGroup()
 
 	def __del__(self):

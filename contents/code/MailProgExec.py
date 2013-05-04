@@ -56,21 +56,24 @@ class MailProgExec(QThread):
 			if self.Settings.value('anotherAuthData', '0').toString() == '1' :
 				anotherAuthData = True
 			self.Settings.endGroup()
-			self.parent.wallet.setFolder(self.parent.appletName)
-			accPswd = self.parent.wallet.readPassword(accName)[1]
+			accNameConverted = False
+			if self.parent.Keyring.name=='GnomeKeyring' \
+					and isinstance(accName, basestring) :
+				accName = accName.toLocal8Bit().data()
+				accNameConverted = True
+			accPswd = self.parent.Keyring.get_password(accName)
 			sendPass = ''
-			if anotherAuthData and self.parent.wallet.hasFolder(self.parent.appletName+'_SEND') :
-				self.parent.wallet.setFolder(self.parent.appletName+'_SEND')
-				sendPass = self.parent.wallet.readPassword(accName)[1]
+			if anotherAuthData :
+				sendPass = self.parent.Keyring.get_password(accName, self.parent.appletName+'_SEND')
 			if not isinstance(accPswd, basestring) :
 				accPswd = accPswd.toLocal8Bit().data()
 			if not isinstance(sendPass, basestring) :
 				sendPass = sendPass.toLocal8Bit().data()
 			## accName decode after accPswd for getting correct account password
-			if not isinstance(accName, basestring) :
+			if not accNameConverted and isinstance(accName, basestring) :
 				accName = accName.toLocal8Bit().data()
 			#print (anotherAuthData, accName, accPswd, sendPass)
-			pathToViewer = self.parent.user_or_sys('contents/code/mailViewer.py')
+			pathToViewer = self.parent.user_or_sys('mailViewer.py')
 			#print dateStamp() , (accName, serv_, port_, login_, authMethod_, \
 			#					connMethod_, inbox, accPswd, accIds)
 			str_ = str(randomString(24))

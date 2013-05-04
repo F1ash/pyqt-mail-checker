@@ -102,8 +102,10 @@ class EditParam(QWidget):
 		# in emitEditedSignal()
 
 	def saveAccountData(self):
-		if hasattr(self, 'receiveParams') : self.receiveParams.saveData()
-		if hasattr(self, 'sendParams')    : self.sendParams.saveData()
+		if hasattr(self, 'receiveParams') and self.receiveParams is not None :
+			self.receiveParams.saveData()
+		if hasattr(self, 'sendParams') and self.sendParams is not None :
+			self.sendParams.saveData()
 		# data saved
 		self.blink(True, False)
 		# after blink auto clear and emit edited-signal

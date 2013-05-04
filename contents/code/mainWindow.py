@@ -21,27 +21,27 @@
 #  
 
 try :
-	from Functions import *
-	from MailProgExec import MailProgExec
-	from Filter import Filters
-	from Proxy import ProxySettings
-	from Examples import Examples
-	from Translator import Translator
-	from IdleMailing import IdleMailing
-	from EditAccounts import EditAccounts
-	from WaitIdle import WaitIdle
-	from AppletSettings import AppletSettings
-	from FontNColor import Font_n_Colour
-	from CheckMailThread import ThreadCheckMail
-	from Passwd import PasswordManipulate
-	from PageDialog import PageDialog
-	from MessageStackWidget import MessageStackWidget
 	from PyQt4.QtCore import *
 	from PyQt4.QtGui import *
-	from PyKDE4.kdeui import KWallet
 	import string, time, os.path, sys
+	
+	from Utils.Functions import *
+	from SettingsDialog.Filter import Filters
+	from SettingsDialog.Proxy import ProxySettings
+	from SettingsDialog.Examples import Examples
+	from SettingsDialog.EditAccounts import EditAccounts
+	from SettingsDialog.AppletSettings import AppletSettings
+	from SettingsDialog.FontNColor import Font_n_Colour
+	from SettingsDialog.Passwd import *
+	from SettingsDialog.PageDialog import PageDialog
+	from Threads.IdleMailing import IdleMailing
+	from Threads.WaitIdle import WaitIdle
+	from Threads.CheckMailThread import ThreadCheckMail
+	from MessageStack.MessageStackWidget import MessageStackWidget
+	from MailProgExec import MailProgExec
+	from Translator import Translator
 	#sys.stderr = open('/dev/shm/errorMailChecker' + str(time.time()) + '.log','w')
-	sys.stdout = open('/tmp/outMailChecker' + time.strftime("_%Y_%m_%d_%H:%M:%S", time.localtime()) + '.log','w')
+	#sys.stdout = open('/tmp/outMailChecker' + time.strftime("_%Y_%m_%d_%H:%M:%S", time.localtime()) + '.log','w')
 except Exception, err :
 	print "Exception: ", err
 finally:
@@ -68,10 +68,11 @@ class MainWindow(QWidget):
 		self.appletName = 'pyqt-mail-checker'
 		self.tr = Translator()
 		self.setWindowTitle(self.tr._translate('M@il Checker'))
-		self.Settings = QSettings('plasmaMailChecker','plasmaMailChecker') #self.appletName,self.appletName)
+		self.Settings = QSettings(self.appletName, self.appletName)
 		self.GeneralLOCK = QMutex()
 		self.someFunctions = Required(self)
 		self.initPrefixAndSuffix()
+		self.initWorkParameters()
 		self.init()
 
 	def init(self):
@@ -91,7 +92,6 @@ class MainWindow(QWidget):
 		self.viewJob.connect(self.mailViewJobUp)
 		self.clearJob.connect(self.mailViewJobClean)
 
-		self.maxShowedMail = int(self.initValue('MaxShowedMail', '1024'))
 		AutoRun = self.initValue('AutoRun')
 		if AutoRun != '0' :
 			#QApplication.postEvent(self, QEvent(QEvent.User))
@@ -285,6 +285,19 @@ class MainWindow(QWidget):
 		suffix = suff + '</font>'
 		return prefix, suffix
 
+	def initWorkParameters(self):
+		self.checkTimeOut = self.initValue('TimeOut', '600')
+		self.msgLifeTime = int(self.initValue('MsgLifeTime', '30'))
+		self.waitThread = self.initValue('WaitThread', '120')
+		self.maxShowedMail = int(self.initValue('MaxShowedMail', '1024'))
+		self.mailsInGroup = int(self.initValue('MailsInGroup', '5'))
+		self.KeyringName = self.initValue('Keyring', '')
+
+		self.passwordManipulate = PasswordManipulate(self)
+		if hasattr(self.passwordManipulate, 'Keyring') :
+			self.Keyring = self.passwordManipulate.Keyring
+		else : self.Keyring = None
+
 	def initPrefixAndSuffix(self):
 		self.initColourAndFont()
 		self.headerPref, self.headerSuff = self.getPrefixAndSuffix( \
@@ -464,16 +477,11 @@ class MainWindow(QWidget):
 			self.Settings.beginGroup(accountName)
 			self.accountCommand[accountName] = self.initValue('CommandLine', ' ')
 			self.Settings.endGroup()
-		timeOut = self.initValue('TimeOut', '600')
-		self.msgLifeTime = int(self.initValue('MsgLifeTime', '30'))
-		self.waitThread = self.initValue('WaitThread', '120')
-		self.maxShowedMail = int(self.initValue('MaxShowedMail', '1024'))
-		self.mailsInGroup = int(self.initValue('MailsInGroup', '5'))
 
 		self.initStat = True
 		self.someFunctions.initPOP3Cache()
 
-		self.Timer.start(int(timeOut) * 1000)
+		self.Timer.start(int(self.checkTimeOut) * 1000)
 		print dateStamp() ,  'processInit'
 		QApplication.postEvent(self, QEvent(1011))
 
@@ -515,7 +523,7 @@ class MainWindow(QWidget):
 			self.disableIconClick()
 		else:
 			self.labelStat.setText("<font color=red><b>" + self.tr._translate('..stopped..') + "</b></font>")
-			self.icon.setIconSize(self.getIconActualSize("mailChecker_web"))
+			self.icon.setIconSize(self.getIconActualSize("mailChecker_stop"))
 			self.icon.setIcon(QIcon.fromTheme("mailChecker_stop"))
 			return None
 
@@ -530,7 +538,9 @@ class MainWindow(QWidget):
 					self.Settings.endGroup()
 					#print dateStamp() , accountName.toLocal8Bit().data(), connectMethod, enable
 					if str(enable) == '1' :
-						data = (accountName, self.wallet.readPassword(accountName)[1])
+						# use toLocal8Bit().data() for GnomeKeyring
+						pswd = self.Keyring.get_password(accountName.toLocal8Bit().data())
+						data = (accountName, pswd)
 						if connectMethod == 'imap\idle' :
 							exist = False
 							for item in self.idleMailingList :
@@ -745,7 +755,7 @@ class MainWindow(QWidget):
 		parent.addPage(self.editAccounts, self.tr._translate("Accounts"))
 		self.appletSettings = AppletSettings(self, parent)
 		parent.addPage(self.appletSettings, self.tr._translate("Settings"))
-		self.passwordManipulate = PasswordManipulate(self, parent)
+		#self.passwordManipulate = PasswordManipulate(self, parent)
 		parent.addPage(self.passwordManipulate, self.tr._translate("Password Manipulation"))
 		self.fontsNcolour = Font_n_Colour(self, parent)
 		parent.addPage(self.fontsNcolour, self.tr._translate("Font and Colour"))
@@ -753,7 +763,7 @@ class MainWindow(QWidget):
 		parent.addPage(self.filters, self.tr._translate("Filters"))
 		self.proxy = ProxySettings(self, parent)
 		parent.addPage(self.proxy, self.tr._translate("Proxy"))
-		self.examples = Examples(self.user_or_sys('EXAMPLES'), parent)
+		self.examples = Examples(self, parent)
 		parent.addPage(self.examples, self.tr._translate("EXAMPLES"))
 		self.connect(parent, SIGNAL("okClicked()"), self.configAccepted)
 		self.connect(parent, SIGNAL("cancelClicked()"), self.configDenied)
@@ -795,30 +805,26 @@ class MainWindow(QWidget):
 					 self.tr._translate('Cancel'))
 			if not answer : self.proxy.saveData()
 		self.Settings.setValue('UseProxy', 'True' if self.proxy.enableProxy.checkState()==Qt.Checked else 'False')
+		if self.passwordManipulate.StateChanged :
+			answer = QMessageBox.question (self.dialog, \
+					 self.tr._translate('Password Manipulation'), \
+					 self.tr._translate('Changes was not completed.'), \
+					 self.tr._translate('Save'), \
+					 self.tr._translate('Cancel'))
+			if not answer : self.passwordManipulate.saveData()
 
 	def checkAccess(self):
-		self.wallet = KWallet.Wallet.openWallet(KWallet.Wallet.LocalWallet(), 0)
-		if self.wallet is None :
-			self.eventNotification(self.tr._translate("Warning :\nAccess denied!"))
-			return False
-		if not self.wallet.hasFolder(self.appletName) :
-			self.wallet.createFolder(self.appletName)
-		self.wallet.setFolder(self.appletName)
-		return True
+		if self.Keyring :
+			if self.Keyring.open_Keyring() : return True
+		self.eventNotification(self.tr._translate("Warning :\nAccess denied!"))
+		return False
 
 	def configAccepted(self):
 		self.disconnect(self, SIGNAL('refresh'), self.refreshData)
 		if not self.checkAccess() : return None
 		self.settingsChangeComplete()
 		self.disableIconClick()
-		x = ''
-		try:
-			self.Timer.stop()
-		except Exception, x :
-			print dateStamp() ,  x, '  acceptConf_1'
-		finally : pass
-		# refresh color & font Variables
-		self.initPrefixAndSuffix()
+		self.Timer.stop()
 		self.configHide()
 		self.connect(self, SIGNAL('refresh'), self.refreshData)
 		self.emit(SIGNAL('killThread'))
@@ -826,7 +832,6 @@ class MainWindow(QWidget):
 	@pyqtSlot(name='configHide')
 	def configDenied(self):
 		if hasattr(self, 'dialog') :
-			self.dialog.updateGeometry()
 			self.Settings.setValue('SettingsGeometry', self.dialog.saveGeometry())
 			self.disconnect(self.dialog, SIGNAL("okClicked()"), self.configAccepted)
 			self.disconnect(self.dialog, SIGNAL("cancelClicked()"), self.configDenied)
@@ -855,16 +860,15 @@ class MainWindow(QWidget):
 	def enterPassword(self):
 		if self.checkAccess() :
 			#print dateStamp() ,  'eP'
-			self.importAccPasswords()
 			self.emit(SIGNAL('access'))
 		else :
 			#print dateStamp() ,  'eP_1'
 			self.initStat = False
 
 	def eventClose(self):
-		print dateStamp() ,  '  eventCloseMethod'
 		self.initStat = False
 		if self.closeFlag :
+			print dateStamp() ,  '  eventCloseMethod'
 			self.disconnect(self, SIGNAL('refresh'), self.refreshData)
 			self.disconnect(self, SIGNAL('access'), self.processInit)
 			self.disconnect(self, SIGNAL('destroyed()'), self.eventClose)
@@ -874,30 +878,23 @@ class MainWindow(QWidget):
 			self.disableIconClick()
 			self.configHide()
 			self.MessageStackWidget.close()
-		self.closeFlag = False
-		x = ''
-		try :
 			self.Timer.stop()
-			if not(self.wallet is None) :
-				self.wallet.closeWallet(self.appletName, True)
-				print dateStamp() ,  ' wallet closed'
-		except Exception, x :
-			print dateStamp() , x, '  eventClose_1'
-		finally : pass
-		try :
-			self.someFunctions.savePOP3Cache()
-		except IOError, x :
-			print dateStamp() ,x, '  eventClose_2'
-		finally : pass
-		self.updateGeometry()
-		self.Settings.setValue('Geometry', self.saveGeometry())
-		self.killMailCheckerThread()
-		self.GeneralLOCK.unlock()
-		count = self.initValue('stayDebLog', '5')
-		cleanDebugOutputLogFiles(int(count))
-		print dateStamp() , "MailChecker destroyed manually."
-		#sys.stderr.close()
-		sys.stdout.close()
+			self.Keyring.close_Keyring()
+			try :
+				self.someFunctions.savePOP3Cache()
+			except IOError, x :
+				print dateStamp() ,x, '  eventClose_2'
+			finally : pass
+			self.updateGeometry()
+			self.Settings.setValue('Geometry', self.saveGeometry())
+			self.killMailCheckerThread()
+			self.GeneralLOCK.unlock()
+			count = self.initValue('stayDebLog', '5')
+			cleanDebugOutputLogFiles(int(count))
+			print dateStamp() , "MailChecker destroyed manually."
+			#sys.stderr.close()
+			#sys.stdout.close()
+		self.closeFlag = False
 		self.close()
 
 	def closeEvent(self, ev):
@@ -928,6 +925,11 @@ class MainWindow(QWidget):
 		self.someFunctions.savePOP3Cache()
 		self.initStat = False
 		
+		# refresh color & font Variables
+		self.initPrefixAndSuffix()
+		
+		self.initWorkParameters()
+		
 		# refresh plasmoid Header
 		self.TitleDialog.setText(self.headerPref + self.title + self.headerSuff)
 		self.TitleDialog.setStyleSheet(self.headerColourStyle)
@@ -937,15 +939,6 @@ class MainWindow(QWidget):
 
 	def mouseDoubleClickEvent(self, ev):
 		self.showConfigurationInterface()
-
-	def importAccPasswords(self):
-		if self.appletName in self.wallet.walletList() :
-			self.old_wallet = KWallet.Wallet.openWallet(self.appletName, 0)
-			if not (self.old_wallet is None) :
-				entryList = self.old_wallet.entryList()
-				for item in entryList :
-					self.wallet.writePassword( item, self.old_wallet.readPassword(item)[1] )
-				self.wallet.deleteWallet(self.appletName)
 
 	def reloadApp(self): self.enterPassword()
 
@@ -999,9 +992,9 @@ class MainWindow(QWidget):
 		for accountName in self.accountList :
 			try :
 				if d['acc'] == accountName :
-					self.listNewMail += '<pre>' + accountName + '(IDLE)&#09;' + \
+					self.listNewMail += accountName + '(IDLE)\t' + \
 											str(d['msg'][1]) + ' | ' + \
-											str(d['msg'][2]) + '</pre>'
+											str(d['msg'][2])
 					newMailExist = True
 					if hasattr(self, 'label') :
 						self.label[i].setStyleSheet(self.accountSColourStyle)
@@ -1025,8 +1018,8 @@ class MainWindow(QWidget):
 			finally : pass
 		if d['state'] == SIGNDATA :
 			self.trayIcon.showMessage ( self.tr._translate('M@il Checker'), \
-								self.headerPref + self.listNewMail + self.headerSuff, \
-								QIcon.fromTheme("mailChecker"), 5000 )
+								self.listNewMail, \
+								QSystemTrayIcon.Information, 5000 )
 			''' detect count of new mail '''
 			countOfAllNewMail = d['msg'][1]
 			overLoad = False

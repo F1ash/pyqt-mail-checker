@@ -10,5 +10,27 @@ rm -rf ./$APP_NAME-$APP_VERSION/.gitignore
 rm -rf ./$APP_NAME-$APP_VERSION/packet
 find ./$APP_NAME-$APP_VERSION -type f -name *.pyc -exec rm -f {} \;
 find ./$APP_NAME-$APP_VERSION -type f -name *.pyo -exec rm -f {} \;
+find ./$APP_NAME-$APP_VERSION -type f -name *.qm  -exec rm -f {} \;
+
+# for building
+rm -rf ~/rpmbuild/BUILD/$APP_NAME-$APP_VERSION
+cp -r ./$APP_NAME-$APP_VERSION/$APP_NAME.spec ~/rpmbuild/SPECS
+##############
+
 tar cfj $APP_NAME-$APP_VERSION.tar.gz ./$APP_NAME-$APP_VERSION
 rm -rf ./$APP_NAME-$APP_VERSION
+
+# for building
+cp -r $APP_NAME-$APP_VERSION.tar.gz ~/rpmbuild/SOURCES/$APP_VERSION.tar.gz
+##############
+
+# build
+cd ~/rpmbuild/SPECS
+rpmbuild -ba $APP_NAME.spec
+#######
+
+# install
+cd ~/rpmbuild/RPMS/noarch
+su -c 'yum -y reinstall ./pyqt-mail-checker-*.rpm'
+cd ~
+#########

@@ -21,7 +21,7 @@
 
 from PyQt4.QtCore import *
 from Functions import randomString, pid_exists, dateStamp, readDataFiles
-import os.path, signal, os
+import signal, os
 
 class ThreadCheckMail(QThread):
 	def __init__(self, obj = None, accountData = [('', '')], timeout = 120, parent = None):
@@ -53,7 +53,7 @@ class ThreadCheckMail(QThread):
 		try:
 			x = ''
 			self.Timer.start(self.timeout)
-			path = self.user_or_sys('code/mail.py')
+			path = self.user_or_sys('mail.py')
 			i = 0
 			for accountData in self.accData :
 				if self.WAIT :

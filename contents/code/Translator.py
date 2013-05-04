@@ -35,7 +35,7 @@ class Translator(QTranslator):
 		self.context = context
 
 	def user_or_sys(self, path_):
-		return os.path.join(sys.path[0], path_)
+		return os.path.join(sys.path[0], 'misc', path_)
 
 	def _translate(self, sourceText):
 		res = self.translate(self.context, sourceText)
