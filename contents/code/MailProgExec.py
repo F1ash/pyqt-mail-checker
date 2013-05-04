@@ -58,7 +58,7 @@ class MailProgExec(QThread):
 			self.Settings.endGroup()
 			accNameConverted = False
 			if self.parent.Keyring.name=='GnomeKeyring' \
-					and isinstance(accName, basestring) :
+					and not isinstance(accName, basestring) :
 				accName = accName.toLocal8Bit().data()
 				accNameConverted = True
 			accPswd = self.parent.Keyring.get_password(accName)
