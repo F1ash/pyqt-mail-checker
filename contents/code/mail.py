@@ -20,7 +20,7 @@
 #  
 #  
 
-from MailFunc import checkMail, QString
+from Utils.MailFunc import checkMail, QString
 import sys, os, os.path
 
 if __name__ == '__main__':

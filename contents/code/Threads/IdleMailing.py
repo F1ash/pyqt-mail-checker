@@ -21,9 +21,9 @@
 #  
 
 from PyQt4.QtCore import QThread, QTimer
-from imapUTF7 import imapUTF7Encode
-from MailFunc import dateStamp, getMailAttributes, getCurrentElemTime, clearBlank, imapAuth
-from Functions import SIGNERRO, SIGNSTOP, SIGNINIT, SIGNDATA
+from Utils.imapUTF7 import imapUTF7Encode
+from Utils.MailFunc import dateStamp, getMailAttributes, getCurrentElemTime, clearBlank, imapAuth
+from Utils.Functions import SIGNERRO, SIGNSTOP, SIGNINIT, SIGNDATA
 from string import join
 from random import randint
 
@@ -39,7 +39,7 @@ class IdleMailing(QThread):
 		self.Settings = self.prnt.Settings
 		self.countProbe = int(self.Settings.value('CountProbe').toString())
 		self.TIMEOUT = self.Settings.value('timeoutSocks', 45).toUInt()[0]
-		self.readAccountData = parent.someFunctions.readAccountData
+		#self.readAccountData = parent.someFunctions.readAccountData
 
 	def runIdle(self):
 		self.restarting = False
@@ -136,7 +136,7 @@ class IdleMailing(QThread):
 		self.key = True
 		self.answer = []
 		self.timer.timeout.connect(self.restartIdle)
-		self.authentificationData = self.readAccountData(self.name)
+		self.authentificationData = self.prnt.someFunctions.readAccountData(self.name)
 		self.lastElemTime = self.authentificationData[6]
 		newMailIds = []
 

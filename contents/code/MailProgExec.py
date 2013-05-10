@@ -20,7 +20,7 @@
 #  
 #  
 
-from Functions import dateStamp, randomString, dlm
+from Utils.Functions import dateStamp, randomString, dlm
 from PyQt4.QtCore import *
 import string
 
@@ -59,19 +59,19 @@ class MailProgExec(QThread):
 			accNameConverted = False
 			if self.parent.Keyring.name=='GnomeKeyring' \
 					and not isinstance(accName, basestring) :
-				accName = accName.toLocal8Bit().data()
+				accName = '' if accName is None else accName.toLocal8Bit().data()
 				accNameConverted = True
 			accPswd = self.parent.Keyring.get_password(accName)
 			sendPass = ''
 			if anotherAuthData :
 				sendPass = self.parent.Keyring.get_password(accName, self.parent.appletName+'_SEND')
 			if not isinstance(accPswd, basestring) :
-				accPswd = accPswd.toLocal8Bit().data()
+				accPswd =  '' if accPswd is None else accPswd.toLocal8Bit().data()
 			if not isinstance(sendPass, basestring) :
-				sendPass = sendPass.toLocal8Bit().data()
+				sendPass =  '' if sendPass is None else sendPass.toLocal8Bit().data()
 			## accName decode after accPswd for getting correct account password
-			if not accNameConverted and isinstance(accName, basestring) :
-				accName = accName.toLocal8Bit().data()
+			if not accNameConverted and not isinstance(accName, basestring) :
+				accName =  '' if accName is None else accName.toLocal8Bit().data()
 			#print (anotherAuthData, accName, accPswd, sendPass)
 			pathToViewer = self.parent.user_or_sys('mailViewer.py')
 			#print dateStamp() , (accName, serv_, port_, login_, authMethod_, \

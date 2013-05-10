@@ -20,7 +20,7 @@
 #  
 
 from PyQt4.QtCore import *
-from Functions import randomString, pid_exists, dateStamp, readDataFiles
+from Utils.Functions import randomString, pid_exists, dateStamp, readDataFiles
 import signal, os
 
 class ThreadCheckMail(QThread):

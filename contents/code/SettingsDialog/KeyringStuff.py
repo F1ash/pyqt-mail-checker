@@ -405,7 +405,7 @@ class KDEKWallet():
 		return True
 
 	def close_Keyring(self): 
-		if not(self.wallet is None) :
+		if hasattr(self, 'wallet') and (self.wallet is None) :
 			self.wallet.closeWallet(self.wallet.walletName(), True)
 
 	def supported(self):
@@ -451,4 +451,3 @@ def get_all_keyring(obj):
 	if _all_keyring is None:
 		_all_keyring = [ KEYRING[0], KEYRING[1], KEYRING[2] ]
 	return _all_keyring
-

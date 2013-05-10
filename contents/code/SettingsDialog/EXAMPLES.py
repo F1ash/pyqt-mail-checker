@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-EXAMPLES = '\n\
-EXAMPLES :\n\
+EXAMPLES = \
+'EXAMPLES :\n\
 (Thanks to Murz at http://kde-look.org)\n\
 \n\
 1. Open thunderbird and selecting needed folder (folder path you must enter manually):\n\

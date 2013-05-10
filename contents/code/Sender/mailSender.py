@@ -23,8 +23,8 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from Translator import Translator
-from TextFunc import MAILTO_REGEXP
-from MailFunc import loadSocketModule
+from Utils.TextFunc import MAILTO_REGEXP
+from Utils.MailFunc import loadSocketModule
 from re import findall
 
 global ModuleExist

@@ -21,7 +21,7 @@
 #  
 
 from PyQt4.QtCore import QTranslator, QString
-from Functions import lang as Lang
+from Utils.Functions import lang as Lang
 import os.path, sys
 
 class Translator(QTranslator):

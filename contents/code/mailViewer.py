@@ -19,8 +19,8 @@
 #  
 #  
 
-from MailFunc import *
-from Functions import dlm
+from Utils.MailFunc import *
+from Utils.Functions import dlm
 import sys, os, os.path
 from PyQt4 import QtGui
 from Viewer.MainWindow import MainWindow

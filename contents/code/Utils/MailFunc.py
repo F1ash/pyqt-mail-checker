@@ -198,7 +198,7 @@ def readAccountData(account = ''):
 	connMethod_ = Settings.value('connectMethod').toString()
 	last_ = Settings.value('lastElemValue').toString()
 	enable = Settings.value('Enabled').toString()
-	if str(connMethod_) == 'imap' :
+	if connMethod_.startsWith('imap') :
 		inbox = Settings.value('Inbox').toString()
 	else :
 		inbox = ''
@@ -333,8 +333,8 @@ def imapAuth(serv, port, login, passw, authMthd, inbox, idle = False):
 			m = imaplib.IMAP4_SSL(serv, port)
 		else :
 			m = imaplib.IMAP4(serv, port)
-	except Exception :
-		return ('', None), m, False
+	except Exception, err :
+		return ('', str(err)), m, False
 	tag = m._new_tag()
 	m.send("%s CAPABILITY\r\n" % tag)
 	#print dateStamp(), "%s CAPABILITY\r\n" % tag
@@ -345,13 +345,17 @@ def imapAuth(serv, port, login, passw, authMthd, inbox, idle = False):
 	#print dateStamp(), resp
 	idleable = True if 'idle' in serves else False
 
-	if m.login(login, passw)[0] == 'OK' :
-		if inbox == '' :
-			mailBox = 'INBOX'
-		else :
-			mailBox = unicode(QString(inbox).toUtf8().data(), 'utf-8')
-		#print dateStamp(), mailBox, imapUTF7Encode(mailBox)
-		answer = m.select(imapUTF7Encode(mailBox))
+	try :
+		if m.login(login, passw)[0] == 'OK' :
+			if inbox == '' :
+				mailBox = 'INBOX'
+			else :
+				mailBox = unicode(QString(inbox).toUtf8().data(), 'utf-8')
+			#print dateStamp(), mailBox, imapUTF7Encode(mailBox)
+			answer = m.select(imapUTF7Encode(mailBox))
+	except Exception, err :
+		answer = ('', str(err))
+	finally : pass
 	return answer, m, idleable
 
 def checkNewMailIMAP4(accountData = ['', '']):

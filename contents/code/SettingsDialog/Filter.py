@@ -24,7 +24,7 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from Buttons import ButtonPanel
 from Translator import Translator
-from Functions import dataToList, FROM_filter, SUBJ_filter
+from Utils.Functions import dataToList, FROM_filter, SUBJ_filter
 import os.path, string
 
 def saveListToFile(l, path):

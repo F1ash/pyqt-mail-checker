@@ -23,11 +23,11 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from PyQt4.QtWebKit import QWebView, QWebPage, QWebSettings
-from TextFunc import *
+from Utils.TextFunc import *
 from Translator import Translator
 from Mail import Mail
-from MailFunc import imapAuth, popAuth, Settings
-from Functions import dateFormat, randomString, dateStamp
+from Utils.MailFunc import imapAuth, popAuth, Settings
+from Utils.Functions import dateFormat, randomString, dateStamp
 from email import message_from_string
 import os.path, os, shutil
 
@@ -138,7 +138,9 @@ def recImap4Mail(obj):
 	if answer[0] == 'OK' :
 		getMail(obj, m, 'imap')
 		m.close()
-	else : res = False
+	else :
+		res = False
+		print "Authentification Error: %s."%answer[1]
 	if not (m is None) : m.logout()
 	return res
 
