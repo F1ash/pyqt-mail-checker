@@ -400,6 +400,8 @@ def checkNewMailIMAP4(accountData = ['', '']):
 		else:
 			#print dateStamp(), 'AuthError'
 			probeError, countAll, countNew = False, 0, 0
+			print dateStamp(), answer[1], '  IMAP4_1'
+			ErrorMsg += '\n' + answer[1]
 
 		if newMailExist :
 			lastElemTime = getCurrentElemTime(m, countAll)

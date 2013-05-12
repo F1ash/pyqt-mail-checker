@@ -39,7 +39,7 @@ class IdleMailing(QThread):
 		self.Settings = self.prnt.Settings
 		self.countProbe = int(self.Settings.value('CountProbe').toString())
 		self.TIMEOUT = self.Settings.value('timeoutSocks', 45).toUInt()[0]
-		#self.readAccountData = parent.someFunctions.readAccountData
+		self.readAccountData = parent.someFunctions.readAccountData
 
 	def runIdle(self):
 		self.restarting = False
@@ -136,7 +136,7 @@ class IdleMailing(QThread):
 		self.key = True
 		self.answer = []
 		self.timer.timeout.connect(self.restartIdle)
-		self.authentificationData = self.prnt.someFunctions.readAccountData(self.name)
+		self.authentificationData = self.readAccountData(self.name)
 		self.lastElemTime = self.authentificationData[6]
 		newMailIds = []
 
@@ -148,7 +148,6 @@ class IdleMailing(QThread):
 						self.authentificationData[2], self.passw, \
 						self.authentificationData[4], self.authentificationData[8], \
 						True)
-				#print self.answer, self.mail, idleable
 				if idleable :
 					msg = "IDLE mode is available"
 				else :
@@ -200,6 +199,8 @@ class IdleMailing(QThread):
 																		unSeen, NewMailAttributes, \
 																		join(newMailIds, ' ')]})
 						break
+				elif self.answer[0] != 'OK' :
+					print dateStamp(), answer[1], '  IMAP4_IDLE'
 			except Exception, err :
 				print dateStamp(), err
 			finally : pass
