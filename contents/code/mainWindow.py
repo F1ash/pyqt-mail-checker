@@ -41,7 +41,7 @@ try :
 	from MailProgExec import MailProgExec
 	from Translator import Translator
 	#sys.stderr = open('/dev/shm/errorMailChecker' + str(time.time()) + '.log','w')
-	#sys.stdout = open('/tmp/outMailChecker' + time.strftime("_%Y_%m_%d_%H:%M:%S", time.localtime()) + '.log','w')
+	sys.stdout = open('/tmp/outMailChecker' + time.strftime("_%Y_%m_%d_%H:%M:%S", time.localtime()) + '.log','w')
 except Exception, err :
 	print "Exception: ", err
 finally:
@@ -893,7 +893,7 @@ class MainWindow(QWidget):
 			cleanDebugOutputLogFiles(int(count))
 			print dateStamp() , "MailChecker destroyed manually."
 			#sys.stderr.close()
-			#sys.stdout.close()
+			sys.stdout.close()
 		self.closeFlag = False
 		self.close()
 
