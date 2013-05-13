@@ -196,7 +196,8 @@ def readAccountData(account = ''):
 	login_ = Settings.value('login').toString()
 	authMethod_ = Settings.value('authentificationMethod').toString()
 	connMethod_ = Settings.value('connectMethod').toString()
-	last_ = Settings.value('lastElemValue').toString()
+	# time.time() for the initiate a time-point of reference
+	last_ = Settings.value('lastElemValue', time.time()).toString()
 	enable = Settings.value('Enabled').toString()
 	if connMethod_.startsWith('imap') :
 		inbox = Settings.value('Inbox').toString()

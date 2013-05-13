@@ -201,6 +201,9 @@ class IdleMailing(QThread):
 						break
 				elif self.answer[0] != 'OK' :
 					print dateStamp(), answer[1], '  IMAP4_IDLE'
+					# send authentification error notify
+					self.prnt.idleThreadMessage.emit({'acc': self.name, 'state': SIGNERRO, \
+													'msg': [answer[1]]})
 			except Exception, err :
 				print dateStamp(), err
 			finally : pass
