@@ -186,6 +186,8 @@ class GetMail(QThread):
 		else :
 			self.Parent.Parent.statusBar.showMessage(self.Parent.tr._translate('Job completed with error.'))
 		self.Parent.Parent.reload_.setEnabled(True)
+		if self.Parent.SoundEnabled :
+			self.Parent.Parent.jobResult.emit(res)
 
 	def stop(self):
 		self.key = False
@@ -204,6 +206,7 @@ class Box(QTabWidget):
 		self.iconDatabasePath = os.path.join('/tmp', randomString(24))
 		os.mkdir(self.iconDatabasePath)
 		self.Settings = Settings
+		self.SoundEnabled = self.Settings.value('Sound', False).toBool()
 
 		self.setMovable(True)
 		self.setIconSize(QSize(SIZE, SIZE))

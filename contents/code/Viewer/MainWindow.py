@@ -25,8 +25,10 @@ from PyQt4.QtCore import *
 from PyQt4.QtWebKit import QWebSettings
 from Box import Box
 from Translator import Translator
+from Sound import Sound
 
 class MainWindow(QMainWindow):
+	jobResult = pyqtSignal(bool)
 	def __init__(self, data = {}, parent = None):
 		QMainWindow.__init__(self, parent)
 		self.runned = False
@@ -34,6 +36,7 @@ class MainWindow(QMainWindow):
 		self.autoLoadImage = False
 		self.privateEnable = False
 		self.data = data
+		self.sound = Sound(self)
 
 		self.setWindowTitle(self.tr._translate('Mail Viewer'))
 		self.setWindowIcon(QIcon().fromTheme("mail"))
@@ -75,6 +78,7 @@ class MainWindow(QMainWindow):
 
 		self.menuTab = Box(self.data, self)
 		self.setCentralWidget(self.menuTab)
+		self.jobResult.connect(self.jobResultNotify)
 
 	def _image(self): self.regimeChange('image', self.image_.isChecked())
 
@@ -93,6 +97,12 @@ class MainWindow(QMainWindow):
 		self.menuTab = Box(self.data, self)
 		self.setCentralWidget(self.menuTab)
 		self.menuTab.startGetMail()
+
+	def jobResultNotify(self, result = False):
+		if result :
+			self.sound.Complete.play()
+		else :
+			self.sound.Failed.play()
 
 	def _close(self): self.eventClose()
 

@@ -38,6 +38,7 @@ class AppletSettings(QWidget):
 
 		timeOut = self.initValue('TimeOut', '600')
 		AutoRun = self.initValue('AutoRun', '0')
+		soundEnabled = self.Settings.value('Sound', False).toBool()
 		countProbe = self.initValue('CountProbe', '3')
 		lifeTime = self.initValue('MsgLifeTime', '30')
 		showError = self.initValue('ShowError', '1')
@@ -140,6 +141,13 @@ class AppletSettings(QWidget):
 		self.mailInGroupBox.setEnabled(False)
 		self.layout.addWidget(self.mailInGroupBox, 9, 5)
 
+		self.soundLabel = QLabel(self.tr._translate("Sound Enable :"))
+		self.layout.addWidget(self.soundLabel, 10, 0)
+		self.soundBox = QCheckBox()
+		if soundEnabled :
+			self.soundBox.setCheckState(Qt.Checked)
+		self.layout.addWidget(self.soundBox, 10, 5)
+
 		self.setLayout(self.layout)
 		self.maxMailBox.valueChanged.emit(int(maxShowedMail))
 
@@ -183,6 +191,8 @@ class AppletSettings(QWidget):
 			self.Settings.setValue('ShowVersion', '1')
 		else:
 			self.Settings.setValue('ShowVersion', '0')
+		value = self.soundBox.isChecked()
+		self.Settings.setValue('Sound', value)
 
 		self.Settings.sync()
 

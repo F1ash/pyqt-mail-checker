@@ -25,7 +25,6 @@ from PyQt4.QtGui import QWidget, QLabel, \
 						QPushButton, QIcon, \
 						QSizePolicy, QProgressBar
 from PyQt4.QtCore import Qt, QEvent
-from Translator import Translator
 
 class MessageDialog(QWidget):
 	def __init__(self, mailList, jobID = '', sec = 0, parent = None):
@@ -33,7 +32,7 @@ class MessageDialog(QWidget):
 		self.prnt = parent
 		self.jobID = jobID
 		self.frozen = False
-		self.tr = Translator()
+		self.tr = self.prnt.prnt.tr
 		self.setWindowTitle(self.tr._translate('M@il Checker : MailView Dialog'))
 		self.setStyleSheet("QWidget {background: rgba(235,240,255,128);}")
 		self.mailList = QLabel(mailList)
@@ -72,13 +71,21 @@ class MessageDialog(QWidget):
 
 	def accepted(self):
 		self.prnt.prnt.viewJob.emit(self.jobID)
+		if self.prnt.prnt.SoundEnabled :
+			self.prnt.prnt.sound.Accepted.play()
 		self.close()
-	def rejected(self): self.close()
 
-	def freez(self):
+	def rejected(self, common = False):
+		if self.prnt.prnt.SoundEnabled and not common :
+			self.prnt.prnt.sound.Cleared.play()
+		self.close()
+
+	def freez(self, common = False):
 		self.killTimer(self.lifetimeID)
 		self.setStyleSheet("QWidget {background: rgba(100,175,255,25);}")
 		self.frozen = True
+		if self.prnt.prnt.SoundEnabled and not common :
+			self.prnt.prnt.sound.Frozen.play()
 
 	def timerEvent(self, ev):
 		if ev.type()==QEvent.Timer :

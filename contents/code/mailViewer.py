@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #  mailViewer.py
 #  
 #  Copyright 2012 Flash <kaperang07@gmail.com>

@@ -52,12 +52,16 @@ class MessageStackWidget(QWidget):
 		self.stackLayout.addWidget(self.MessageStack[jobID])
 		self.stack.setLayout(self.stackLayout)
 		self.setLayout(self.scrolledLayout)
+		if self.prnt.SoundEnabled :
+			self.prnt.sound.NewMessage.play()
 
 	def freezAllMessages(self):
 		self.mutex.lock()
 		for jobID in self.MessageStack.iterkeys() :
-			self.MessageStack[jobID].freez()
+			self.MessageStack[jobID].freez(common = True)
 		self.mutex.unlock()
+		if self.prnt.SoundEnabled :
+			self.prnt.sound.Frozen.play()
 
 	def clearAllMessages(self):
 		self.clearAllMSG.setEnabled(False)
@@ -66,9 +70,11 @@ class MessageStackWidget(QWidget):
 		for jobID in self.MessageStack.iterkeys() :
 			to_Delete.append(jobID)
 		for jobID in to_Delete :
-			self.MessageStack[jobID].rejected()
+			self.MessageStack[jobID].rejected(common = True)
 		self.mutex.unlock()
 		self.clearAllMSG.setEnabled(True)
+		if self.prnt.SoundEnabled :
+			self.prnt.sound.Cleared.play()
 
 	def checkStackContent(self, key = ''):
 		_key = str(key)

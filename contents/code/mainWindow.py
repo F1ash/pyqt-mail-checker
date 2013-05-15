@@ -25,6 +25,7 @@ try :
 	from PyQt4.QtGui import *
 	import string, time, os.path, sys
 	
+	from misc.Sound import Sound
 	from Utils.Functions import *
 	from SettingsDialog.Filter import Filters
 	from SettingsDialog.Proxy import ProxySettings
@@ -77,6 +78,7 @@ class MainWindow(QWidget):
 
 	def init(self):
 		self.T = ThreadCheckMail(self)
+		self.sound = Sound(self)
 		self.Timer = QTimer()
 
 		self.initMainWindow()
@@ -99,6 +101,8 @@ class MainWindow(QWidget):
 			self.Timer1.setSingleShot(True)
 			self.Timer1.timeout.connect(self.enterPassword)
 			self.Timer1.start(2000)
+		if self.SoundEnabled :
+			self.sound.AppletStarted.play()
 
 	def initMainWindow(self):
 		self.initMainWindowLayout()
@@ -292,6 +296,7 @@ class MainWindow(QWidget):
 		self.maxShowedMail = int(self.initValue('MaxShowedMail', '1024'))
 		self.mailsInGroup = int(self.initValue('MailsInGroup', '5'))
 		self.KeyringName = self.initValue('Keyring', '')
+		self.SoundEnabled = self.Settings.value('Sound', False).toBool()
 
 		self.passwordManipulate = PasswordManipulate(self)
 		if hasattr(self.passwordManipulate, 'Keyring') :
@@ -895,10 +900,13 @@ class MainWindow(QWidget):
 			#sys.stderr.close()
 			sys.stdout.close()
 		self.closeFlag = False
-		self.close()
+		if self.SoundEnabled :
+			self.sound.AppletClosed.finished.connect(self.close)
+			self.sound.AppletClosed.play()
 
 	def closeEvent(self, ev):
 		if self.closeFlag and ev.type()==QEvent.Close :
+			ev.ignore()
 			self.eventClose()
 		elif not self.closeFlag and ev.type()==QEvent.Close :
 			ev.accept()

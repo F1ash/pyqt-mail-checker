@@ -423,20 +423,24 @@ class KDEKWallet():
 
 	def has_entry(self, key, _folder = None):
 		folder = _folder if _folder else self.appletName
-		return not self.wallet.keyDoesNotExist(KWallet.Wallet.LocalWallet(), folder, key)
+		if hasattr(self, 'wallet') and not(self.wallet is None) :
+			return not self.wallet.keyDoesNotExist(KWallet.Wallet.LocalWallet(), folder, key)
+		return False
 
 	def get_password(self, key, _folder = None):
 		folder = _folder if _folder else self.appletName
-		if self.wallet.keyDoesNotExist(KWallet.Wallet.LocalWallet(), folder, key):
-			return None
-		self.setFolder(folder)
-		result = self.wallet.readPassword(key)[1]
-		return unicode(result)
+		if hasattr(self, 'wallet') and not(self.wallet is None) :
+			if self.wallet.keyDoesNotExist(KWallet.Wallet.LocalWallet(), folder, key):
+				return None
+			self.setFolder(folder)
+			result = self.wallet.readPassword(key)[1]
+			return unicode(result)
 
 	def set_password(self, key, password = None, folder = None):
-		if key :
-			self.setFolder(folder if folder else self.appletName)
-			self.wallet.writePassword(key, password)
+		if hasattr(self, 'wallet') and not(self.wallet is None) :
+			if key :
+				self.setFolder(folder if folder else self.appletName)
+				self.wallet.writePassword(key, password)
 
 _all_keyring = None
 

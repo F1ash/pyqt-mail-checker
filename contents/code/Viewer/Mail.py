@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #  Mail.py
 #  
 #  Copyright 2012 Flash <kaperang07@gmail.com>
