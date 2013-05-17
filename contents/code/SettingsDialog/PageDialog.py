@@ -30,9 +30,10 @@ from Translator import Translator
 class PageDialog(QWidget):
 	okClicked = pyqtSignal()
 	cancelClicked = pyqtSignal()
-	def __init__(self, parent = None):
+	def __init__(self, obj, parent = None):
 		QWidget.__init__(self, parent)
-		#self.setModal(False)
+		self.prnt = obj   #parent
+		#self.setModal(True)
 		self.tr = Translator()
 		self.setWindowTitle(self.tr._translate('M@il Checker : Settings'))
 		self.tabWidget = QTabWidget(self)
@@ -51,23 +52,26 @@ class PageDialog(QWidget):
 		self.setMinimumWidth(100)
 		self.ok.clicked.connect(self.accepted)
 		self.cancel.clicked.connect(self.rejected)
+		self.restoreGeometry(self.prnt.Settings.value('SettingsGeometry').toByteArray())
+		self.parentVisibilityState = \
+		(self.prnt.isVisible(), self.prnt.isMinimized(), self.prnt.isMaximized())
 
 	def addPage(self, wdg, wdgName):
 		self.tabWidget.addTab(wdg, wdgName)
 
 	def accepted(self): self.okClicked.emit()
 	def rejected(self): self.cancelClicked.emit()
+	#def accepted(self): self.prnt.configAccepted()
+	#def rejected(self): self.prnt.configDenied()
 
 	def closeEvent(self, ev):
-		if ev.type()==QEvent.Close :
-			self.cancelClicked.emit()
+		self.prnt.show()
+		self.prnt.Settings.setValue('SettingsGeometry', self.saveGeometry())
+		self.hide()
 		ev.ignore()
-
-	def __del__(self):
-		self.layout.removeWidget(self.tabWidget)
-		self.layout.removeItem(self.buttonLayout)
-		self.buttonLayout.removeWidget(self.ok)
-		self.buttonLayout.removeWidget(self.cancel)
-		del self.tabWidget
-		del self.ok
-		del self.cancel
+		if not self.parentVisibilityState[0] :
+			self.prnt.autoHide(3)
+		elif not self.parentVisibilityState[1] and not self.parentVisibilityState[2] :
+			self.prnt.showNormal()
+		elif self.parentVisibilityState[1] : self.prnt.showMinimized()
+		else : self.prnt.showMaximized()

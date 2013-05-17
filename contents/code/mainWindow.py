@@ -773,13 +773,13 @@ class MainWindow(QWidget):
 		self.connect(parent, SIGNAL("okClicked()"), self.configAccepted)
 		self.connect(parent, SIGNAL("cancelClicked()"), self.configDenied)
 
-	def showConfigurationInterface(self):
-		self.dialog = PageDialog()
-		self.createConfigurationInterface(self.dialog)
-		self.dialog.restoreGeometry(self.Settings.value('SettingsGeometry').toByteArray())
-		self.dialog.show()
-		position = self.pos() if self.isVisible() else self.trayIconMenu.pos()
-		self.dialog.move(self.mapToGlobal(position))
+	def showConfigurationInterface(self, key = False):
+		if not hasattr(self, 'dialog') or self.dialog is None :
+			self.dialog = PageDialog(self)
+			self.createConfigurationInterface(self.dialog)
+			if not key :
+				self.dialog.show()
+				self.dialog.move(self.mapToGlobal(self.trayIconMenu.pos()))
 
 	def settingsChangeComplete(self):
 		if self.editAccounts.StateChanged :
@@ -821,12 +821,31 @@ class MainWindow(QWidget):
 	def checkAccess(self):
 		if self.Keyring :
 			if self.Keyring.open_Keyring() : return True
-		self.eventNotification(self.tr._translate("Warning :\nAccess denied!"))
+			else :
+				self.eventNotification(self.tr._translate("Warning :\nAccess denied!"))
+		else :
+			self.eventNotification(self.tr._translate(\
+				"Warning :\nSecurity service for password restore\ndon`t choiced!"))
+			if hasattr(self, 'dialog') and self.dialog is not None :
+				self.dialog.tabWidget.setCurrentWidget(self.passwordManipulate)
+			else :
+				self.showConfigurationInterface(True)
+				self.dialog.tabWidget.setCurrentWidget(self.passwordManipulate)
+				self.dialog.show()
+				self.dialog.move(self.mapToGlobal(self.trayIconMenu.pos()))
 		return False
 
 	def configAccepted(self):
 		self.disconnect(self, SIGNAL('refresh'), self.refreshData)
-		if not self.checkAccess() : return None
+		if self.Keyring is None and self.passwordManipulate.StateChanged \
+				and self.passwordManipulate.Keyring is not None :
+			self.continueReset()
+		elif self.Keyring is not None and self.checkAccess() :
+			self.continueReset()
+		else :
+			self.configHide()
+
+	def continueReset(self):
 		self.settingsChangeComplete()
 		self.disableIconClick()
 		self.Timer.stop()
@@ -836,11 +855,12 @@ class MainWindow(QWidget):
 
 	@pyqtSlot(name='configHide')
 	def configDenied(self):
-		if hasattr(self, 'dialog') :
-			self.Settings.setValue('SettingsGeometry', self.dialog.saveGeometry())
+		if hasattr(self, 'dialog') and self.dialog is not None :
 			self.disconnect(self.dialog, SIGNAL("okClicked()"), self.configAccepted)
 			self.disconnect(self.dialog, SIGNAL("cancelClicked()"), self.configDenied)
-			self.dialog.hide()
+			self.dialog.close()
+			del self.dialog
+			self.dialog = None
 
 	def _enterPassword(self):
 		if not self.initStat :
@@ -884,7 +904,7 @@ class MainWindow(QWidget):
 			self.configHide()
 			self.MessageStackWidget.close()
 			self.Timer.stop()
-			self.Keyring.close_Keyring()
+			if self.Keyring : self.Keyring.close_Keyring()
 			try :
 				self.someFunctions.savePOP3Cache()
 			except IOError, x :

@@ -39,38 +39,46 @@ class PasswordManipulate(QWidget):
 		self.checkAccess = self.Parent.checkAccess
 		self.currentKeyring = QComboBox()
 		self.currentKeyring.addItem("")
+		i = 0
 		for item in get_all_keyring(self) :
 			state = item.supported()
-			if state : icon = QIcon.fromTheme("dialog-ok-apply")
-			elif state==0 : icon = QIcon.fromTheme("dialog-ok")
-			else : icon = QIcon.fromTheme("dialog-cancel")
+			if state :
+				icon = QIcon.fromTheme("dialog-ok-apply")
+				info = self.tr._translate("Available / Recommended")
+			elif state==0 :
+				icon = QIcon.fromTheme("dialog-ok")
+				info = self.tr._translate("Available")
+			else :
+				icon = QIcon.fromTheme("dialog-cancel")
+				info = self.tr._translate("Not Available")
 			self.currentKeyring.addItem(icon, item.name)
+			i += 1
+			self.currentKeyring.setItemData(i, info)
 		self.currentKeyring.setToolTip(self.tr._translate("Current Keyring"))
-		keyringName = self.Settings.value("Keyring", "").toString()
-		i = self.currentKeyring.findText(keyringName)
-		if i>=0 : self.currentKeyring.setCurrentIndex(i)
 		self.currentKeyring.currentIndexChanged[int].connect(self.stateChanged)
-		info = "???????"
+		keyringName = self.Settings.value("Keyring", "").toString()
 		self.keyringInfo = QLabel()
-		#self.keyringInfo.setPixmap(QIcon.fromTheme("task-attention").pixmap(32, 32))
-		self.keyringInfo.setText("INFO: %s" % info)
 
 		self.VBLayout = QVBoxLayout()
 		self.VBLayout.addWidget(self.currentKeyring)
 		self.VBLayout.addWidget(self.keyringInfo)
 		self.setLayout(self.VBLayout)
+		i = self.currentKeyring.findText(keyringName)
+		if i>=0 : self.currentKeyring.setCurrentIndex(i)
 		self.StateChanged = False
 		self.Keyring = None if i<1 else KEYRING[i-1]
 
 	def stateChanged(self, i=0):
 		self.StateChanged = True
-		# change keyring info
+		self.keyringInfo.setText("INFO: %s" % self.currentKeyring.itemData(i).toString())
+		self.Keyring = None if i<1 else KEYRING[i-1]
+		#self.Parent.Keyring = self.Keyring
 
 	def saveData(self):
 		self.StateChanged = False
 		self.Settings.setValue("Keyring", self.currentKeyring.currentText())
 
-	def eventNotification(self, msg = ''):
+	def createKeyring(self, msg = ''):
 		self.Parent.eventNotification(msg)
 		self.title = QLabel(self.tr._translate("Create Keyring"))
 		self.title.setAlignment(Qt.AlignHCenter)

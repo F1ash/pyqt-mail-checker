@@ -314,7 +314,7 @@ class GnomeKeyring():
 			allowed = True
 			try :
 				if self.appletName not in _gnome_keyrings :
-					self.prnt.eventNotification("GnomeKeyring: %s doesn`t exist"%self.appletName)
+					self.prnt.createKeyring("GnomeKeyring: %s doesn`t exist"%self.appletName)
 					return False
 				self.KEYRING_NAME = self.appletName
 			except Exception, err :
