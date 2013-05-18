@@ -14,24 +14,24 @@ class MessageStackWidget(QWidget):
 		self.mutex = QMutex()
 		self.parentVisibilityState = \
 		(self.prnt.isVisible(), self.prnt.isMinimized(), self.prnt.isMaximized())
-		
+
 		self.stack = QWidget()
 		self.scroll = QScrollArea()
 		self.scroll.setWidgetResizable(True)
 		self.scroll.setWidget(self.stack)
-		
+
 		self.scrolledLayout = QVBoxLayout()
 		self.buttonLayout = QHBoxLayout()
 		self.stackLayout = QVBoxLayout()
 		self.stackLayout.setSpacing(3)
-		
+
 		self.freezAllMSG = QPushButton(QIcon.fromTheme("layer-visible-on"), '')
 		self.freezAllMSG.setToolTip(self.prnt.tr._translate('Freez all messages'))
 		self.freezAllMSG.clicked.connect(self.freezAllMessages)
 		self.clearAllMSG = QPushButton(QIcon.fromTheme("edit-clear"), '')
 		self.clearAllMSG.setToolTip(self.prnt.tr._translate('Clear all messages'))
 		self.clearAllMSG.clicked.connect(self.clearAllMessages)
-		
+
 		self.buttonLayout.addWidget(self.freezAllMSG)
 		self.buttonLayout.addWidget(self.clearAllMSG)
 		self.scrolledLayout.addItem(self.buttonLayout)
@@ -41,15 +41,12 @@ class MessageStackWidget(QWidget):
 
 		self.setMinimumHeight(self.prnt.desktop.height()/5)
 		self.setMinimumWidth(self.prnt.desktop.width()/3)
-		#self.setStyleSheet("QDialog {background: rgba(255,255,255,20);}")
-		#self.scroll.setStyleSheet("QScrollArea {background: rgba(0,0,0,10);}")
 		self.stack.setStyleSheet("QWidget {background: rgba(235,240,255,0);}")
 		self.MessageStack = {}
 		self.checkEmpty.connect(self.checkStackContent)
 
 	def newMessage(self, str_, jobID, lifetime = 0):
 		self.MessageStack[jobID] = MessageDialog(str_, jobID, lifetime, self)
-		#self.stackLayout.addWidget(self.MessageStack[jobID])
 		self.stackLayout.insertWidget(0, self.MessageStack[jobID])
 		self.stack.setLayout(self.stackLayout)
 		self.setLayout(self.scrolledLayout)

@@ -85,7 +85,7 @@ class EditParam(QWidget):
 		self.setLayout(self.layout)
 
 	def clearParamArea(self):
-		if hasattr(self, 'split') :
+		if hasattr(self, 'split') and self.split is not None :
 			self.split.setVisible(False)
 			self.layout.takeAt(0)
 			self.setLayout(self.layout)

@@ -39,7 +39,7 @@ class EditList(QWidget):
 
 		self.stringEditor = QLineEdit()
 		self.stringEditor.setToolTip(self.tr._translate("Account name"))
-		self.stringEditor.setPlaceholderText(self.tr._translate("Enter Account Name for Add"))
+		self.stringEditor.setPlaceholderText(self.tr._translate("Enter Account Name for Add to List"))
 		self.accountListBox = QListWidget()
 		self.accountListBox.setSortingEnabled(True)
 		self.accountListBox.itemDoubleClicked.connect(self.renameItem)
@@ -102,24 +102,25 @@ class EditList(QWidget):
 				self.accountListBox.setCurrentItem(item)
 				self.editItem()
 			else :
-				QMessageBox.information(self, "ADD NAME",
-					self.tr._translate('Name is empty.'))
 				# blink string Editor
+				self.blinked = self.stringEditor
 				self.currentStyle = self.stringEditor.styleSheet()
 				self.counter = 0
 				self.timer = self.startTimer(4)
+				QMessageBox.information(self, "ADD NAME",
+					self.tr._translate('Name is empty.'))
 			self.stringEditor.clear()
-
 
 	def timerEvent(self, ev):
 		if self.timer == ev.timerId() :
 			self.counter += 1
 			i = self.counter
-			self.stringEditor.setStyleSheet("QLineEdit {background: rgba(%s,%s,%s,128);}"%(i, i, i))
+			self.blinked.setStyleSheet("QWidget {background: rgba(%s,%s,%s,128);}"%(i, i, i))
 			if i>= 255 :
 				self.killTimer(self.timer)
-				self.stringEditor.setStyleSheet(self.currentStyle)
+				self.blinked.setStyleSheet(self.currentStyle)
 				self.counter = 0
+				self.blinked = None
 
 	def renameItem(self, item):
 		if not self.checkAccess() : return None
@@ -176,7 +177,18 @@ class EditList(QWidget):
 		item = self.accountListBox.currentItem()
 		if item is None :
 			text = self.tr._translate('Account not selected.')
+			# blink Account List Widget
+			self.blinked = self.accountListBox
+			self.currentStyle = self.accountListBox.styleSheet()
+			self.counter = 0
+			self.timer = self.startTimer(4)
 		else :
+			answer = QMessageBox.question (self, \
+					 "DELETE", \
+					 self.tr._translate('You sure?'), \
+					 self.tr._translate('Yes'), \
+					 self.tr._translate('Reject'))
+			if answer : return None
 			text = item.text()
 			# uncomment below for remove available
 			self.Settings.remove(item.text())
@@ -196,6 +208,11 @@ class EditList(QWidget):
 			item = self.accountListBox.currentItem()
 			if item is None :
 				text = self.tr._translate('Account not selected.')
+				# blink Account List Widget
+				self.blinked = self.accountListBox
+				self.currentStyle = self.accountListBox.styleSheet()
+				self.counter = 0
+				self.timer = self.startTimer(4)
 				QMessageBox.information(self, "EDIT", text)
 			else :
 				#text = item.text()
