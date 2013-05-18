@@ -49,7 +49,8 @@ class MessageStackWidget(QWidget):
 
 	def newMessage(self, str_, jobID, lifetime = 0):
 		self.MessageStack[jobID] = MessageDialog(str_, jobID, lifetime, self)
-		self.stackLayout.addWidget(self.MessageStack[jobID])
+		#self.stackLayout.addWidget(self.MessageStack[jobID])
+		self.stackLayout.insertWidget(0, self.MessageStack[jobID])
 		self.stack.setLayout(self.stackLayout)
 		self.setLayout(self.scrolledLayout)
 		if self.prnt.SoundEnabled :

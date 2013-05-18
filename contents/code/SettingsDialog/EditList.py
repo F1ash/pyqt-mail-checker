@@ -39,6 +39,7 @@ class EditList(QWidget):
 
 		self.stringEditor = QLineEdit()
 		self.stringEditor.setToolTip(self.tr._translate("Account name"))
+		self.stringEditor.setPlaceholderText(self.tr._translate("Enter Account Name for Add"))
 		self.accountListBox = QListWidget()
 		self.accountListBox.setSortingEnabled(True)
 		self.accountListBox.itemDoubleClicked.connect(self.renameItem)
@@ -67,9 +68,9 @@ class EditList(QWidget):
 		self.VBLayout.addWidget(self.editAccountItem)
 		self.VBLayout.addWidget(self.delAccountItem)
 
-		self.layout.addWidget(self.accountListBox, 0, 0)
-		self.layout.addWidget(self.stringEditor, 1, 0)
-		self.layout.addLayout(self.VBLayout, 0, 1, 1, 2)
+		self.layout.addWidget(self.stringEditor, 0, 0)
+		self.layout.addWidget(self.accountListBox, 1, 0)
+		self.layout.addLayout(self.VBLayout, 1, 1, 1, 2)
 		self.setLayout(self.layout)
 
 	def addItem(self):
@@ -97,7 +98,28 @@ class EditList(QWidget):
 				accList_.append(text)
 				accList = accList_.join(';')
 				self.Settings.setValue('Accounts', accList)
+				# edit new account
+				self.accountListBox.setCurrentItem(item)
+				self.editItem()
+			else :
+				QMessageBox.information(self, "ADD NAME",
+					self.tr._translate('Name is empty.'))
+				# blink string Editor
+				self.currentStyle = self.stringEditor.styleSheet()
+				self.counter = 0
+				self.timer = self.startTimer(4)
 			self.stringEditor.clear()
+
+
+	def timerEvent(self, ev):
+		if self.timer == ev.timerId() :
+			self.counter += 1
+			i = self.counter
+			self.stringEditor.setStyleSheet("QLineEdit {background: rgba(%s,%s,%s,128);}"%(i, i, i))
+			if i>= 255 :
+				self.killTimer(self.timer)
+				self.stringEditor.setStyleSheet(self.currentStyle)
+				self.counter = 0
 
 	def renameItem(self, item):
 		if not self.checkAccess() : return None

@@ -45,22 +45,26 @@ class ReceiveParams(QWidget):
 		self.HB1Layout.addWidget(QLabel(self.tr._translate("Enable : ")), 0, 2)
 
 		self.serverLineEdit = QLineEdit()
+		self.serverLineEdit.setPlaceholderText(self.tr._translate("Enter Server"))
 		self.serverLineEdit.setToolTip(self.tr._translate("Example : imap.gmail.com, pop.mail.ru"))
 		self.HB1Layout.addWidget(self.serverLineEdit, 1, 0)
 
 		self.portBox = QSpinBox()
+		self.portBox.setToolTip(self.tr._translate("Port for connect"))
 		self.portBox.setMinimum(0)
 		self.portBox.setMaximum(65535)
 		self.portBox.setSingleStep(1)
 		self.HB1Layout.addWidget(self.portBox, 1, 1)
 
 		self.enabledBox = QCheckBox()
+		self.enabledBox.setToolTip(self.tr._translate("Enable account"))
 		self.enabledBox.setCheckState(Qt.Unchecked)
 		self.HB1Layout.addWidget(self.enabledBox, 1, 2, Qt.AlignHCenter)
 
 		self.HB2Layout = QGridLayout()
 
 		self.connectMethodBox = QComboBox()
+		self.connectMethodBox.setToolTip(self.tr._translate("Mail Protocol"))
 		self.connectMethodBox.addItem('POP3',QVariant('pop'))
 		self.connectMethodBox.addItem('IMAP4',QVariant('imap'))
 		self.connectMethodBox.addItem('IMAP4\IDLE',QVariant('imap\idle'))
@@ -69,6 +73,7 @@ class ReceiveParams(QWidget):
 		self.HB2Layout.addWidget(self.connectMethodBox, 0, 0)
 
 		self.cryptBox = QComboBox()
+		self.cryptBox.setToolTip(self.tr._translate("Encript connect"))
 		self.cryptBox.addItem('None',QVariant('None'))
 		self.cryptBox.addItem('SSL',QVariant('SSL'))
 		#self.cryptBox.addItem('TLS',QVariant('TLS'))
@@ -98,6 +103,7 @@ class ReceiveParams(QWidget):
 		self.HB3Layout.addWidget(QLabel(self.tr._translate("Password : ")), 0, 1)
 
 		self.userNameLineEdit = QLineEdit()
+		self.userNameLineEdit.setPlaceholderText(self.tr._translate("Enter MailBox Login"))
 		self.HB3Layout.addWidget(self.userNameLineEdit, 1, 0)
 
 		self.passwordLineEdit = QLineEdit()
