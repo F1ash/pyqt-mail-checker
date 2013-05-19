@@ -360,6 +360,9 @@ class MainWindow(QWidget):
 		return os.path.join(sys.path[0], path_)
 
 	def createDialogWidget(self):
+		self.scroll = QScrollArea()
+		self.scroll.setWidgetResizable(True)
+		self.scrolled = QWidget()
 		self.Dialog = QGridLayout()
 		i = 0
 		self.label = []
@@ -381,8 +384,11 @@ class MainWindow(QWidget):
 
 		self.labelStat = QLabel()
 		self.labelStat.setText("<font color=red><b>" + self.tr._translate('..stopped..') + "</b></font>")
-		self.Dialog.addWidget(self.labelStat, i, 0)
-		self.layout.addItem(self.Dialog)
+		#self.Dialog.addWidget(self.labelStat, i, 0)
+		self.scrolled.setLayout(self.Dialog)
+		self.scroll.setWidget(self.scrolled)
+		self.layout.addWidget(self.scroll)
+		self.layout.addWidget(self.labelStat)
 
 	def initSysTrayIcon(self):
 		if not hasattr(self, 'trayIcon') :
