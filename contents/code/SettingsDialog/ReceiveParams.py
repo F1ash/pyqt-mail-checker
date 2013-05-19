@@ -155,7 +155,10 @@ class ReceiveParams(QWidget):
 		if i>=0 : self.accountCommand.setCurrentIndex(i)
 		self.userNameLineEdit.setText(self.Settings.value('login', '').toString())
 		# use toLocal8Bit().data() for GnomeKeyring
-		if self.Keyring.has_entry(self.item.text().toLocal8Bit().data()) :
+		_entry = self.item.text().toLocal8Bit().data() \
+			if self.Keyring.name == "GnomeKeyring" \
+			else self.item.text()
+		if self.Keyring.has_entry(_entry ) :
 			self.passwordLineEdit.setText( '***EncriptedPassWord***' )
 		else:
 			self.passwordLineEdit.setText( '***EncriptedKey_not_created***' )
@@ -182,9 +185,14 @@ class ReceiveParams(QWidget):
 		self.Settings.setValue('CommandLine', self.accountCommand.currentText())
 		self.Settings.setValue('login', self.userNameLineEdit.text())
 		if self.passwordChanged :
-			self.Keyring.set_password(\
-				 self.item.text().toLocal8Bit().data(), \
-				 self.passwordLineEdit.text().toLocal8Bit().data())
+			# use toLocal8Bit().data() for GnomeKeyring
+			_passwd = self.passwordLineEdit.text().toLocal8Bit().data() \
+				if self.Keyring.name == "GnomeKeyring" \
+				else self.passwordLineEdit.text()
+			_key = self.item.text().toLocal8Bit().data() \
+				if self.Keyring.name == "GnomeKeyring" \
+				else self.item.text()
+			self.Keyring.set_password(_key, _passwd)
 			self.passwordLineEdit.setText( '***EncriptedPassWord***' )
 		self.Settings.endGroup()
 

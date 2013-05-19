@@ -109,7 +109,11 @@ class SendParams(QWidget):
 		if i>=0 : self.cryptBox.setCurrentIndex(i)
 		self.portBox.setValue(int(self.Settings.value('sendPort', '25').toString()))
 		self.userNameLineEdit.setText(self.Settings.value('sendLogin', '').toString())
-		if self.Keyring.has_entry(self.item.text(), self.appletName+'_SEND') :
+		# use toLocal8Bit().data() for GnomeKeyring
+		_entry = self.item.text().toLocal8Bit().data() \
+			if self.Keyring.name == "GnomeKeyring" \
+			else self.item.text()
+		if self.Keyring.has_entry(_entry, self.appletName+'_SEND') :
 			self.passwordLineEdit.setText( '***EncriptedPassWord***' )
 		else:
 			self.passwordLineEdit.setText( '***EncriptedKey_not_created***' )
@@ -145,10 +149,14 @@ class SendParams(QWidget):
 		if self.enabledBox.checkState() :
 			self.Settings.setValue('sendLogin', self.userNameLineEdit.text())
 			if self.passwordChanged :
-				self.Keyring.set_password(\
-					self.item.text().toLocal8Bit().data(), \
-					self.passwordLineEdit.text().toLocal8Bit().data(), \
-					self.appletName+'_SEND')
+				# use toLocal8Bit().data() for GnomeKeyring
+				_passwd = self.passwordLineEdit.text().toLocal8Bit().data() \
+					if self.Keyring.name == "GnomeKeyring" \
+					else self.passwordLineEdit.text()
+				_key = self.item.text().toLocal8Bit().data() \
+					if self.Keyring.name == "GnomeKeyring" \
+					else self.item.text()
+				self.Keyring.set_password(_key, _passwd, self.appletName+'_SEND')
 				self.passwordLineEdit.setText( '***EncriptedPassWord***' )
 		self.Settings.endGroup()
 
