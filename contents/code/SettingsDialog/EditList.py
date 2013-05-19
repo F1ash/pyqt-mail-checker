@@ -106,17 +106,18 @@ class EditList(QWidget):
 				self.blinked = self.stringEditor
 				self.currentStyle = self.stringEditor.styleSheet()
 				self.counter = 0
-				self.timer = self.startTimer(4)
+				self.timer = self.startTimer(40)
 				QMessageBox.information(self, "ADD NAME",
 					self.tr._translate('Name is empty.'))
 			self.stringEditor.clear()
 
 	def timerEvent(self, ev):
 		if self.timer == ev.timerId() :
-			self.counter += 1
-			i = self.counter
-			self.blinked.setStyleSheet("QWidget {background: rgba(%s,%s,%s,128);}"%(i, i, i))
-			if i>= 255 :
+			self.counter += 25
+			if self.counter <= 512 :
+				i = self.counter - 256 if self.counter>255 else self.counter
+				self.blinked.setStyleSheet("QWidget {background: rgba(%s,%s,%s,128);}"%(i, i, i))
+			else :
 				self.killTimer(self.timer)
 				self.blinked.setStyleSheet(self.currentStyle)
 				self.counter = 0
@@ -181,7 +182,7 @@ class EditList(QWidget):
 			self.blinked = self.accountListBox
 			self.currentStyle = self.accountListBox.styleSheet()
 			self.counter = 0
-			self.timer = self.startTimer(4)
+			self.timer = self.startTimer(40)
 		else :
 			answer = QMessageBox.question (self, \
 					 "DELETE", \
@@ -212,7 +213,7 @@ class EditList(QWidget):
 				self.blinked = self.accountListBox
 				self.currentStyle = self.accountListBox.styleSheet()
 				self.counter = 0
-				self.timer = self.startTimer(4)
+				self.timer = self.startTimer(40)
 				QMessageBox.information(self, "EDIT", text)
 			else :
 				#text = item.text()
