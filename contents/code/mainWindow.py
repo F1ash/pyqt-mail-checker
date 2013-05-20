@@ -549,11 +549,7 @@ class MainWindow(QWidget):
 					self.Settings.endGroup()
 					#print dateStamp() , accountName.toLocal8Bit().data(), connectMethod, enable
 					if str(enable) == '1' :
-						# use toLocal8Bit().data() for GnomeKeyring
-						accName = accountName.toLocal8Bit().data() \
-							if self.Keyring.name == "GnomeKeyring" \
-							else accountName
-						pswd = self.Keyring.get_password(accName)
+						pswd = self.Keyring.get_password(accountName)
 						data = (accountName, pswd)
 						if connectMethod == 'imap\idle' :
 							exist = False

@@ -59,6 +59,13 @@ _CRYPTED_PASSWORD = 'crypted-password'
 _BLOCK_SIZE = 32
 _PADDING = '0'
 
+def to_unicode(obj):
+	if not isinstance(obj, basestring) and hasattr(obj, 'toLocal8Bit') :
+		return obj.toLocal8Bit().data()
+	elif not isinstance(obj, basestring) and hasattr(obj, 'toUtf8') :
+		return obj.toUtf8().data()
+	return obj
+
 class PasswordSetError(Exception):
 	"""Raised when the password can't be set.
 	"""
@@ -323,7 +330,7 @@ class GnomeKeyring():
 		return allowed
 
 	def create_Keyring(self, password = None):
-		G.create_sync(self.appletName, password)
+		G.create_sync(self.appletName, to_unicode(password))
 
 	def close_Keyring(self):
 		if G.is_available() : G.lock_sync(self.appletName)
@@ -348,7 +355,7 @@ class GnomeKeyring():
 		for item in item_list :
 			attr = G.item_get_attributes_sync(self.appletName, item)
 			keyIn = 'user' in attr and 'domain' in attr
-			if keyIn and attr['user']==key and attr['domain']==folder :
+			if keyIn and attr['user']==to_unicode(key) and attr['domain']==folder :
 				found = True
 				break
 		return found
@@ -363,7 +370,7 @@ class GnomeKeyring():
 		_items = None
 		while i < 10 :
 			try :
-				_items = G.find_network_password_sync(key, folder)
+				_items = G.find_network_password_sync(to_unicode(key), folder)
 				break
 			except G.CancelledError :
 				i+=1
@@ -386,9 +393,9 @@ class GnomeKeyring():
 		try:
 			G.item_create_sync(
 				self.KEYRING_NAME, G.ITEM_NETWORK_PASSWORD,
-				"Password for '%s' in '%s'" % (key, folder),
-				{'user': key, 'domain': folder},
-				password, True)
+				"Password for '%s' in '%s'" % (to_unicode(key), folder),
+				{'user': to_unicode(key), 'domain': folder},
+				to_unicode(password), True)
 		except G.CancelledError:
 			raise PasswordSetError("cancelled by user")
 		finally : pass

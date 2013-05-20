@@ -108,9 +108,8 @@ class PasswordManipulate(QWidget):
 		self.Parent.dialog.tabWidget.setCurrentWidget(self)
 
 	def checkCorrectOfPassword(self):
-		if self.confirm.text().toLocal8Bit().data() == \
-				self.passwrd.text().toLocal8Bit().data() :
-			self.Keyring.create_Keyring(self.passwrd.text().toLocal8Bit().data())
+		if self.confirm.text() == self.passwrd.text() :
+			self.Keyring.create_Keyring(self.passwrd.text())
 			QMessageBox.information(self, \
 					self.tr._translate("Create Keyring"), \
 					self.tr._translate("Keyring created."), \

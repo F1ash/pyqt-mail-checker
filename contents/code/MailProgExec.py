@@ -39,7 +39,7 @@ class MailProgExec(QThread):
 			__str = self.param.keys()[0]
 		if self.command.count('integrated mail Viewer') :
 			""" prepeare file with parameters """
-			accName = __str
+			accName =  '' if __str is None else __str
 			accIds = str(self.param.values()[0])
 			self.Settings.beginGroup(accName)
 			serv_ = self.Settings.value('server').toString().toLocal8Bit().data()
@@ -56,11 +56,6 @@ class MailProgExec(QThread):
 			if self.Settings.value('anotherAuthData', '0').toString() == '1' :
 				anotherAuthData = True
 			self.Settings.endGroup()
-			accNameConverted = False
-			if self.parent.Keyring.name=='GnomeKeyring' \
-					and not isinstance(accName, basestring) :
-				accName = '' if accName is None else accName.toLocal8Bit().data()
-				accNameConverted = True
 			accPswd = self.parent.Keyring.get_password(accName)
 			sendPass = ''
 			if anotherAuthData :
@@ -70,8 +65,8 @@ class MailProgExec(QThread):
 			if not isinstance(sendPass, basestring) :
 				sendPass =  '' if sendPass is None else sendPass.toLocal8Bit().data()
 			## accName decode after accPswd for getting correct account password
-			if not accNameConverted and not isinstance(accName, basestring) :
-				accName =  '' if accName is None else accName.toLocal8Bit().data()
+			if not isinstance(accName, basestring) :
+				accName = accName.toLocal8Bit().data()
 			#print (anotherAuthData, accName, accPswd, sendPass)
 			pathToViewer = self.parent.user_or_sys('mailViewer.py')
 			#print dateStamp() , (accName, serv_, port_, login_, authMethod_, \
