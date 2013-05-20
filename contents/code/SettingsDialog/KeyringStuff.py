@@ -200,6 +200,10 @@ class CryptedFileKeyring(BasicFileKeyring):
 		self.appletName = 'pyqt-mail-checker'
 		self.prnt = parent
 
+	def open_Keyring(self): pass
+
+	def close_Keyring(self): pass
+
 	def supported(self):
 		"""Applicable for all platforms, but not recommend"
 		"""
@@ -209,6 +213,12 @@ class CryptedFileKeyring(BasicFileKeyring):
 		except ImportError:
 			status = -1
 		return status
+
+	def has_entry(self, key, _folder = None): pass
+
+	def get_password(self, key, _folder = None): pass
+
+	def set_password(self, key, password, _folder = None): pass
 
 	def _getpass(self, *args, **kwargs):
 		"""Wrap getpass.getpass(), so that we can override it when testing.
@@ -441,7 +451,7 @@ class KDEKWallet():
 				return None
 			self.setFolder(folder)
 			result = self.wallet.readPassword(key)[1]
-			return unicode(result)
+			return result
 
 	def set_password(self, key, password = None, folder = None):
 		if hasattr(self, 'wallet') and not(self.wallet is None) :

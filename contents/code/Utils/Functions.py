@@ -218,7 +218,7 @@ class Required():
 		login_ = self.Settings.value('login').toString()
 		authMethod_ = self.Settings.value('authentificationMethod').toString()
 		connMethod_ = self.Settings.value('connectMethod').toString()
-		last_ = self.Settings.value('lastElemValue').toString()
+		last_ = self.Settings.value('lastElemValue', time.time()).toString()
 		enable = self.Settings.value('Enabled').toString()
 		if str(connMethod_) == 'imap' :
 			inbox = self.Settings.value('Inbox').toString()
