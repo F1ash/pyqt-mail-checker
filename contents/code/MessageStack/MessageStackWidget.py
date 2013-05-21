@@ -58,7 +58,7 @@ class MessageStackWidget(QWidget):
 		for jobID in self.MessageStack.iterkeys() :
 			self.MessageStack[jobID].freez(common = True)
 		self.mutex.unlock()
-		if self.prnt.SoundEnabled :
+		if self.prnt.SoundEnabled and len(self.MessageStack) :
 			self.prnt.sound.Frozen.play()
 
 	def clearAllMessages(self):
@@ -71,7 +71,7 @@ class MessageStackWidget(QWidget):
 			self.MessageStack[jobID].rejected(common = True)
 		self.mutex.unlock()
 		self.clearAllMSG.setEnabled(True)
-		if self.prnt.SoundEnabled :
+		if self.prnt.SoundEnabled and len(to_Delete) :
 			self.prnt.sound.Cleared.play()
 
 	def checkStackContent(self, key = ''):

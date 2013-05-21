@@ -340,7 +340,11 @@ class GnomeKeyring():
 		return allowed
 
 	def create_Keyring(self, password = None):
-		G.create_sync(self.appletName, to_unicode(password))
+		try :
+			G.create_sync(self.appletName, to_unicode(password))
+		except Exception, err :
+			print "[ In Keyring.create_Keyring() ]: ", err
+		finally : pass
 
 	def close_Keyring(self):
 		if G.is_available() : G.lock_sync(self.appletName)
@@ -420,6 +424,9 @@ class KDEKWallet():
 		self.wallet = KWallet.Wallet.openWallet(KWallet.Wallet.LocalWallet(), 0)
 		if self.wallet is None : return False
 		return True
+
+	def create_Keyring(self, password = None):
+		print "Incorrect request"
 
 	def close_Keyring(self): 
 		if hasattr(self, 'wallet') and not(self.wallet is None) :

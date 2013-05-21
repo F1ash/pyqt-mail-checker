@@ -47,3 +47,6 @@ class Sound():
 
 		self.NewMessage    = Phonon.createPlayer(Phonon.NotificationCategory, \
 				Phonon.MediaSource("/usr/share/sounds/freedesktop/stereo/bell.oga"))
+
+		self.Attention     = Phonon.createPlayer(Phonon.NotificationCategory, \
+				Phonon.MediaSource("/usr/share/sounds/freedesktop/stereo/dialog-warning.oga"))

@@ -72,13 +72,13 @@ class MainWindow(QWidget):
 		self.Settings = QSettings(self.appletName, self.appletName)
 		self.GeneralLOCK = QMutex()
 		self.someFunctions = Required(self)
+		self.sound = Sound(self)
 		self.initPrefixAndSuffix()
 		self.initWorkParameters()
 		self.init()
 
 	def init(self):
 		self.T = ThreadCheckMail(self)
-		self.sound = Sound(self)
 		self.Timer = QTimer()
 
 		self.initMainWindow()
@@ -788,6 +788,7 @@ class MainWindow(QWidget):
 
 	def settingsChangeComplete(self):
 		if self.editAccounts.StateChanged :
+			self.sound.Attention.play()
 			answer = QMessageBox.question (self.dialog, \
 					 self.tr._translate('Accounts'), \
 					 self.tr._translate('Changes was not completed.'), \
@@ -797,6 +798,7 @@ class MainWindow(QWidget):
 		self.appletSettings.refreshSettings()
 		self.fontsNcolour.refreshSettings()
 		if self.filters.StateChanged[0] or self.filters.StateChanged[1] :
+			self.sound.Attention.play()
 			answer = QMessageBox.question (self.dialog, \
 					 self.tr._translate('Filters'), \
 					 self.tr._translate('Changes was not completed.'), \
@@ -808,6 +810,7 @@ class MainWindow(QWidget):
 				if self.filters.fromEditor.isEnabled() :
 					self.filters.saveFilter(1)
 		if self.proxy.StateChanged :
+			self.sound.Attention.play()
 			answer = QMessageBox.question (self.dialog, \
 					 self.tr._translate('Proxy'), \
 					 self.tr._translate('Changes was not completed.'), \
@@ -816,12 +819,14 @@ class MainWindow(QWidget):
 			if not answer : self.proxy.saveData()
 		self.Settings.setValue('UseProxy', 'True' if self.proxy.enableProxy.checkState()==Qt.Checked else 'False')
 		if self.passwordManipulate.StateChanged :
+			self.sound.Attention.play()
 			answer = QMessageBox.question (self.dialog, \
 					 self.tr._translate('Password Manipulation'), \
 					 self.tr._translate('Changes was not completed.'), \
 					 self.tr._translate('Save'), \
 					 self.tr._translate('Cancel'))
 			if not answer : self.passwordManipulate.saveData()
+			else : self.passwordManipulate.rejectChanges()
 
 	def checkAccess(self):
 		if self.Keyring :

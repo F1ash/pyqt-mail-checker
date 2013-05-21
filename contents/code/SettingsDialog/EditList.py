@@ -31,6 +31,7 @@ class EditList(QWidget):
 		self.tr = parent.tr
 		self.Settings = parent.Settings
 		self.checkAccess = self.Parent.checkAccess
+		self.Sound = self.Parent.sound
 		self.accountList = QStringList()
 		self.renamedItem = None
 
@@ -83,6 +84,7 @@ class EditList(QWidget):
 						exist = True
 						break
 				if exist :
+					self.Sound.Attention.play()
 					QMessageBox.information(self, "ADD NAME",
 						self.tr._translate('Name exist already.'))
 					return None
@@ -107,6 +109,7 @@ class EditList(QWidget):
 				self.currentStyle = self.stringEditor.styleSheet()
 				self.counter = 0
 				self.timer = self.startTimer(40)
+				self.Sound.Attention.play()
 				QMessageBox.information(self, "ADD NAME",
 					self.tr._translate('Name is empty.'))
 			self.stringEditor.clear()
@@ -161,6 +164,7 @@ class EditList(QWidget):
 					QMessageBox.information(self, "RENAME", self.renamedItem)
 					print self.renamedItem.toLocal8Bit().data()
 				else :
+					self.Sound.Attention.play()
 					QMessageBox.information(self, "RENAME", \
 						self.tr._translate('Rename is fail.'))
 				self.renamedItem = None
@@ -183,6 +187,7 @@ class EditList(QWidget):
 			self.currentStyle = self.accountListBox.styleSheet()
 			self.counter = 0
 			self.timer = self.startTimer(40)
+			self.Sound.Attention.play()
 		else :
 			answer = QMessageBox.question (self, \
 					 "DELETE", \
@@ -214,6 +219,7 @@ class EditList(QWidget):
 				self.currentStyle = self.accountListBox.styleSheet()
 				self.counter = 0
 				self.timer = self.startTimer(40)
+				self.Sound.Attention.play()
 				QMessageBox.information(self, "EDIT", text)
 			else :
 				#text = item.text()
