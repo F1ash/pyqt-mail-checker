@@ -777,6 +777,7 @@ class MainWindow(QWidget):
 		parent.addPage(self.examples, self.tr._translate("EXAMPLES"))
 		self.connect(parent, SIGNAL("okClicked()"), self.configAccepted)
 		self.connect(parent, SIGNAL("cancelClicked()"), self.configDenied)
+		self.connect(self.dialog, SIGNAL('settingsCancelled()'), self.passwordManipulate.initKeyring)
 
 	def showConfigurationInterface(self, key = False):
 		if not hasattr(self, 'dialog') or self.dialog is None :
@@ -791,7 +792,7 @@ class MainWindow(QWidget):
 			self.sound.Attention.play()
 			answer = QMessageBox.question (self.dialog, \
 					 self.tr._translate('Accounts'), \
-					 self.tr._translate('Changes was not completed.'), \
+					 self.tr._translate('Accounts:\nChanges was not completed.'), \
 					 self.tr._translate('Save'), \
 					 self.tr._translate('Cancel'))
 			if not answer : self.editAccounts.parameters.saveAccountData()
@@ -801,19 +802,17 @@ class MainWindow(QWidget):
 			self.sound.Attention.play()
 			answer = QMessageBox.question (self.dialog, \
 					 self.tr._translate('Filters'), \
-					 self.tr._translate('Changes was not completed.'), \
+					 self.tr._translate('Filters:\nChanges was not completed.'), \
 					 self.tr._translate('Save'), \
 					 self.tr._translate('Cancel'))
 			if not answer :
-				if self.filters.subjEditor.isEnabled() :
-					self.filters.saveFilter(0)
-				if self.filters.fromEditor.isEnabled() :
-					self.filters.saveFilter(1)
+				if self.filters.StateChanged[0] : self.filters.saveFilter(0)
+				if self.filters.StateChanged[1] : self.filters.saveFilter(1)
 		if self.proxy.StateChanged :
 			self.sound.Attention.play()
 			answer = QMessageBox.question (self.dialog, \
 					 self.tr._translate('Proxy'), \
-					 self.tr._translate('Changes was not completed.'), \
+					 self.tr._translate('Proxy:\nChanges was not completed.'), \
 					 self.tr._translate('Save'), \
 					 self.tr._translate('Cancel'))
 			if not answer : self.proxy.saveData()
@@ -822,7 +821,7 @@ class MainWindow(QWidget):
 			self.sound.Attention.play()
 			answer = QMessageBox.question (self.dialog, \
 					 self.tr._translate('Password Manipulation'), \
-					 self.tr._translate('Changes was not completed.'), \
+					 self.tr._translate('Password Manipulation:\nChanges was not completed.'), \
 					 self.tr._translate('Save'), \
 					 self.tr._translate('Cancel'))
 			if not answer : self.passwordManipulate.saveData()
@@ -868,6 +867,7 @@ class MainWindow(QWidget):
 		if hasattr(self, 'dialog') and self.dialog is not None :
 			self.disconnect(self.dialog, SIGNAL("okClicked()"), self.configAccepted)
 			self.disconnect(self.dialog, SIGNAL("cancelClicked()"), self.configDenied)
+			self.disconnect(self.dialog, SIGNAL('settingsCancelled()'), self.passwordManipulate.initKeyring)
 			self.dialog.close()
 			del self.dialog
 			self.dialog = None

@@ -244,11 +244,13 @@ class Required():
 		for accountName in string.split( self.Settings.value('Accounts').toString(), ';' ):
 			self.Settings.beginGroup(accountName)
 			if self.Settings.value('connectMethod').toString() == 'pop' :
-				if not os.path.isfile(dir_ + '/' + QString(accountName).toUtf8().data() + '.cache') :
-					f = open(dir_ + '/' + QString(accountName).toUtf8().data() + '.cache', 'w')
+				fN = os.path.join(dir_, QString(accountName).toUtf8().data() + '.cache')
+				fM = os.path.join('/dev/shm/', QString(accountName).toUtf8().data() + '.cache')
+				if not os.path.isfile(fN) :
+					f = open(fN, 'w')
 					f.close()
-				f = open(dir_ +  '/' + QString(accountName).toUtf8().data() + '.cache', 'r')
-				c = open('/dev/shm/' + QString(accountName).toUtf8().data() + '.cache', 'w')
+				f = open(fN, 'r')
+				c = open(fM, 'w')
 				c.writelines(f.readlines())
 				f.close()
 				c.close()
@@ -261,9 +263,11 @@ class Required():
 		for accountName in string.split( self.Settings.value('Accounts').toString(), ';' ):
 			self.Settings.beginGroup(accountName)
 			if self.Settings.value('connectMethod').toString() == 'pop' :
-				f = open(dir_ + '/' + QString(accountName).toUtf8().data() + '.cache', 'w')
-				if os.path.isfile('/dev/shm/' + QString(accountName).toUtf8().data() + '.cache') :
-					c = open('/dev/shm/' + QString(accountName).toUtf8().data() + '.cache', 'r')
+				fN = os.path.join(dir_, QString(accountName).toUtf8().data() + '.cache')
+				fM = os.path.join('/dev/shm/', QString(accountName).toUtf8().data() + '.cache')
+				f = open(fN, 'w')
+				if os.path.isfile(fM) :
+					c = open(fM, 'r')
 					f.writelines(c.readlines())
 					c.close()
 				f.close()

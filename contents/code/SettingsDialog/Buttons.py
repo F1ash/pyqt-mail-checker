@@ -24,6 +24,7 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
 class ButtonPanel(QWidget):
+	filterChanged = pyqtSignal(int)
 	def __init__(self, id_, parent = None):
 		QWidget.__init__(self, parent)
 
@@ -61,6 +62,8 @@ class ButtonPanel(QWidget):
 		self.layout.addWidget(self.saveButton, 0, Qt.AlignHCenter)
 
 		self.setLayout(self.layout)
+		self.StateChanged = False
+		self.connect(self, SIGNAL("filterChanged(int)"), self.prnt.filtersChanged)
 
 	def addItem(self):
 		self.prnt.addItem(self.id_)
@@ -72,10 +75,11 @@ class ButtonPanel(QWidget):
 		self.prnt.saveFilter(self.id_)
 
 	def activate(self, state):
-		value = 'SUBJFilter' if self.id_ else 'FROMFilter'
-		self.Settings.setValue(value, 'True' if state else 'False')
 		if state : self.prnt.activateSide(self.id_, True)
 		else : self.prnt.activateSide(self.id_, False)
+		if self.StateChanged :
+			self.filterChanged.emit(self.id_)
 
 	def setCurrentState(self):
 		self.activate(self.Enabled)
+		self.StateChanged = True

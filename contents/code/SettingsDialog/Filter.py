@@ -88,6 +88,12 @@ class Filters(QWidget):
 		self.buttonSUBJ.setCurrentState()
 		self.StateChanged = [False, False]
 
+	def filtersChanged(self, _id):
+		if _id :
+			self.subj_FiltersChanged()
+		else :
+			self.from_FiltersChanged()
+
 	def from_FiltersChanged(self):
 		self.StateChanged[0] = True
 
@@ -136,6 +142,10 @@ class Filters(QWidget):
 				i += 1
 			saveListToFile(filter_, self.filterFROM)
 			FROM_filter = dataToList(self.filterFROM)
+		value = 'SUBJFilter' if id_ else 'FROMFilter'
+		panel = self.buttonSUBJ if id_ else self.buttonFROM
+		state = panel.enabledBox.checkState()
+		self.Parent.Settings.setValue(value, 'True' if state else 'False')
 		self.StateChanged[id_] = False
 
 	def activateSide(self, id_, state = False):

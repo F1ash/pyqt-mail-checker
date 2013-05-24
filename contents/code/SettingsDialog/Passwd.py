@@ -68,11 +68,11 @@ class PasswordManipulate(QWidget):
 		self.initKeyring()
 
 	def initKeyring(self):
-		self.StateChanged = False
 		keyringName = self.Settings.value("Keyring", "").toString()
 		i = self.currentKeyring.findText(keyringName)
 		if i>=0 : self.currentKeyring.setCurrentIndex(i)
 		self.Keyring = None if i<1 else KEYRING[i-1]
+		self.StateChanged = False
 
 	def stateChanged(self, i=0):
 		self.StateChanged = True

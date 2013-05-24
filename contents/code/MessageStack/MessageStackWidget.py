@@ -55,10 +55,14 @@ class MessageStackWidget(QWidget):
 
 	def freezAllMessages(self):
 		self.mutex.lock()
+		to_Freez = []
 		for jobID in self.MessageStack.iterkeys() :
+			if not self.MessageStack[jobID].isFrozen() :
+				to_Freez.append(jobID)
+		for jobID in to_Freez :
 			self.MessageStack[jobID].freez(common = True)
 		self.mutex.unlock()
-		if self.prnt.SoundEnabled and len(self.MessageStack) :
+		if self.prnt.SoundEnabled and len(to_Freez) :
 			self.prnt.sound.Frozen.play()
 
 	def clearAllMessages(self):

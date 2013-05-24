@@ -25,6 +25,7 @@ import os
 import sys
 import ConfigParser
 import base64
+from os.path import join, expanduser, isfile
 
 from keyring.util.escape import escape as escape_for_ini
 from keyring.util import properties
@@ -191,22 +192,31 @@ class BasicFileKeyring(KeyringBackend):
 		config_file = open(self.file_path,'w')
 		config.write(config_file)
 
-class CryptedFileKeyring(BasicFileKeyring):
+class CryptedFileKeyring():
 	"""PyCrypto File Keyring"""
 	filename = 'crypted_pass.cfg'
 	crypted_password = None
 	def __init__(self, parent = None):
 		self.name = 'CryptedFileKeyring'
 		self.appletName = 'pyqt-mail-checker'
+		self.file_path = join(expanduser("~/.config"), self.appletName, self.filename)
 		self.prnt = parent
 
-	def open_Keyring(self): pass
+	def open_Keyring(self):
+		allowed = False
+		if self.supported()>=0 :
+			try:
+				self._init_crypter()
+				allowed = True
+			except Exception, err :
+				print "[ In CryptedFileKeyring.open_Keyring() ]: ", err
+			finally : pass
+		return allowed
 
 	def close_Keyring(self): pass
 
 	def supported(self):
-		"""Applicable for all platforms, but not recommend"
-		"""
+		"""Applicable for all platforms, but not recommend"""
 		try:
 			from Crypto.Cipher import AES
 			status = 0
@@ -214,11 +224,57 @@ class CryptedFileKeyring(BasicFileKeyring):
 			status = -1
 		return status
 
-	def has_entry(self, key, _folder = None): pass
+	def has_entry(self, key, _folder = None):
+		folder = _folder if _folder else self.appletName
+		config = ConfigParser.RawConfigParser()
+		config.read(self.file_path)
+		return config.has_option(folder, to_unicode(key))
 
-	def get_password(self, key, _folder = None): pass
+	def get_password(self, key, _folder = None):
+		#get_password(self, service, username):
+		"""Read the password from the file.
+		"""
+		service = escape_for_ini(service)
+		username = escape_for_ini(username)
 
-	def set_password(self, key, password, _folder = None): pass
+		# load the passwords from the file
+		config = ConfigParser.RawConfigParser()
+		if os.path.exists(self.file_path):
+			config.read(self.file_path)
+
+		# fetch the password
+		try:
+			password_base64 = config.get(service, username).encode()
+			# decode with base64
+			password_encrypted = base64.decodestring(password_base64)
+			# decrypted the password
+			password = self.decrypt(password_encrypted).decode('utf-8')
+		except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+			password = None
+		return password
+
+	def set_password(self, key, password, _folder = None):
+		#set_password(self, service, username, password):
+		"""Write the password in the file.
+		"""
+		service = escape_for_ini(service)
+		username = escape_for_ini(username)
+
+		# encrypt the password
+		password_encrypted = self.encrypt(password.encode('utf-8'))
+		# load the password from the disk
+		config = ConfigParser.RawConfigParser()
+		if os.path.exists(self.file_path):
+			config.read(self.file_path)
+
+		# encode with base64
+		password_base64 = base64.encodestring(password_encrypted).decode()
+		# write the modification
+		if not config.has_section(service):
+			config.add_section(service)
+		config.set(service, username, password_base64)
+		config_file = open(self.file_path,'w')
+		config.write(config_file)
 
 	def _getpass(self, *args, **kwargs):
 		"""Wrap getpass.getpass(), so that we can override it when testing.
@@ -269,7 +325,7 @@ class CryptedFileKeyring(BasicFileKeyring):
 	def _check_file(self):
 		"""Check if the password file has been init properly.
 		"""
-		if os.path.exists(self.file_path):
+		if isfile(self.file_path):
 			config = ConfigParser.RawConfigParser()
 			config.read(self.file_path)
 			try:
@@ -343,7 +399,7 @@ class GnomeKeyring():
 		try :
 			G.create_sync(self.appletName, to_unicode(password))
 		except Exception, err :
-			print "[ In Keyring.create_Keyring() ]: ", err
+			print "[ In GnomeKeyring.create_Keyring() ]: ", err
 		finally : pass
 
 	def close_Keyring(self):

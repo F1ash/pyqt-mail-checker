@@ -84,6 +84,7 @@ class MessageDialog(QWidget):
 		self.killTimer(self.lifetimeID)
 		self.setStyleSheet("QWidget {background: rgba(100,175,255,25);}")
 		self.frozen = True
+		self.freezMSG.setEnabled(False)
 		if self.prnt.prnt.SoundEnabled and not common :
 			self.prnt.prnt.sound.Frozen.play()
 
@@ -95,6 +96,8 @@ class MessageDialog(QWidget):
 				self.lifetime.setValue(value-1)
 			else :
 				self.close()
+
+	def isFrozen(self): return self.frozen
 
 	def closeEvent(self, ev):
 		if ev.type()==QEvent.Close :

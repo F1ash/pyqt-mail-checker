@@ -30,10 +30,10 @@ from Translator import Translator
 class PageDialog(QWidget):
 	okClicked = pyqtSignal()
 	cancelClicked = pyqtSignal()
+	settingsCancelled = pyqtSignal()
 	def __init__(self, obj, parent = None):
 		QWidget.__init__(self, parent)
-		self.prnt = obj   #parent
-		#self.setModal(True)
+		self.prnt = obj
 		self.tr = Translator()
 		self.setWindowTitle(self.tr._translate('M@il Checker : Settings'))
 		self.tabWidget = QTabWidget(self)
@@ -60,9 +60,9 @@ class PageDialog(QWidget):
 		self.tabWidget.addTab(wdg, wdgName)
 
 	def accepted(self): self.okClicked.emit()
-	def rejected(self): self.cancelClicked.emit()
-	#def accepted(self): self.prnt.configAccepted()
-	#def rejected(self): self.prnt.configDenied()
+	def rejected(self):
+		self.settingsCancelled.emit()
+		self.cancelClicked.emit()
 
 	def closeEvent(self, ev):
 		self.prnt.show()
