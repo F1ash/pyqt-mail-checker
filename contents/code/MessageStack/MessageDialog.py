@@ -31,6 +31,7 @@ class MessageDialog(QWidget):
 		QWidget.__init__(self, parent)
 		self.prnt = parent
 		self.jobID = jobID
+		self.sec = sec
 		self.frozen = False
 		self.tr = self.prnt.prnt.tr
 		self.setWindowTitle(self.tr._translate('M@il Checker : MailView Dialog'))
@@ -81,7 +82,7 @@ class MessageDialog(QWidget):
 		self.close()
 
 	def freez(self, common = False):
-		self.killTimer(self.lifetimeID)
+		if self.sec : self.killTimer(self.lifetimeID)
 		self.setStyleSheet("QWidget {background: rgba(100,175,255,25);}")
 		self.frozen = True
 		self.freezMSG.setEnabled(False)
@@ -101,7 +102,7 @@ class MessageDialog(QWidget):
 
 	def closeEvent(self, ev):
 		if ev.type()==QEvent.Close :
-			self.killTimer(self.lifetimeID)
+			if self.sec : self.killTimer(self.lifetimeID)
 			self.prnt.checkEmpty.emit(self.jobID)
 			self.prnt.prnt.clearJob.emit(self.jobID)
 			ev.accept()
