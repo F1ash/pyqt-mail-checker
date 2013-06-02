@@ -82,7 +82,8 @@ class ReceiveParams(QWidget):
 
 		self.mailboxLineEdit = QLineEdit()
 		self.mailboxLineEdit.setVisible(False)
-		self.mailboxLineEdit.setToolTip(u'Defailt MailBox : Inbox\nFor example, GMail specified mailbox :\n[Gmail]/All\nor\n[Gmail]/Вся почта')
+		self.mailboxLineEdit.setPlaceholderText(self.tr._translate("Enter monitoring Mail Folder"))
+		self.mailboxLineEdit.setToolTip(u'Defailt monitoring Mail Folder : Inbox\nFor example, GMail specified mailbox :\n[Gmail]/All\nor\n[Gmail]/Вся почта')
 		self.HB2Layout.addWidget(self.mailboxLineEdit, 0, 2)
 
 		self.accountCommand = QComboBox()
@@ -143,7 +144,7 @@ class ReceiveParams(QWidget):
 	def initData(self):
 		self.Settings.beginGroup(self.item.text())
 		self.serverLineEdit.setText(self.Settings.value('server').toString())
-		if self.Settings.value('Enabled', '0').toString() == '1' :
+		if self.Settings.value('Enabled', '1').toString() == '1' :
 			self.enabledBox.setCheckState(Qt.Checked)
 		i = self.connectMethodBox.findData(self.Settings.value('connectMethod', ''), flags = Qt.MatchFixedString)
 		if i>=0 : self.connectMethodBox.setCurrentIndex(i)

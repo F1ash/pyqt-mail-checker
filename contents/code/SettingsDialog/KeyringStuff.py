@@ -23,25 +23,32 @@
 import getpass
 import os
 import sys
+import string
 import ConfigParser
 import base64
 from os.path import join, expanduser, isfile
 
-from keyring.util.escape import escape as escape_for_ini
-from keyring.util import properties
+#############
+#from keyring.util.escape import escape as escape_for_ini
 
-try:
-	from abc import ABCMeta, abstractmethod, abstractproperty
-except ImportError:
-	# to keep compatible with older Python versions.
-	class ABCMeta(type):
-		pass
+LEGAL_CHARS = ( getattr(string, 'letters', None) ) + string.digits
 
-	def abstractmethod(funcobj):
-		return funcobj
+ESCAPE_FMT = "_%02X"
 
-	def abstractproperty(funcobj):
-		return property(funcobj)
+def _escape_char(c):
+    "Single char escape. Return the char, escaped if not already legal"
+    if isinstance(c, int):
+        c = unichr(c)
+    return c if c in LEGAL_CHARS else ESCAPE_FMT % ord(c)
+
+def escape_for_ini(value):
+    """
+    Escapes given string so the result consists of alphanumeric chars and
+    underscore only.
+    """
+    return "".join(_escape_char(c) for c in value.encode('utf-8'))
+#
+##############
 
 try:
 	import gnomekeyring as G
@@ -70,127 +77,6 @@ def to_unicode(obj):
 class PasswordSetError(Exception):
 	"""Raised when the password can't be set.
 	"""
-
-class KeyringBackend(object):
-	"""The abstract base class of the keyring, every backend must implement
-	this interface.
-	"""
-	__metaclass__ = ABCMeta
-
-	@abstractmethod
-	def supported(self):
-		"""Return if this keyring supports current environment:
-		-1: not applicable
-		 0: suitable
-		 1: recommended
-		"""
-		return -1
-
-	@abstractmethod
-	def get_password(self, service, username):
-		"""Get password of the username for the service
-		"""
-		return None
-
-	@abstractmethod
-	def set_password(self, service, username, password):
-		"""Set password for the username of the service
-		"""
-		raise PasswordSetError("reason")
-
-	def get_password(self, service, username):
-		"""Override the get_password() in KeyringBackend.
-		"""
-		try:
-			password = self.keyring_impl.password_get(service, username)
-		except OSError:
-			password = None
-		return password
-
-	def set_password(self, service, username, password):
-		"""Override the set_password() in KeyringBackend.
-		"""
-		try:
-			self.keyring_impl.password_set(service, username, password)
-		except OSError, e:
-			raise PasswordSetError(e.message)
-
-class BasicFileKeyring(KeyringBackend):
-	"""BasicFileKeyring is a file-based implementation of keyring.
-
-	It stores the password directly in the file, and supports the
-	encryption and decryption. The encrypted password is stored in base64
-	format.
-	"""
-
-	@properties.NonDataProperty
-	def file_path(self):
-		"""
-		The path to the file where passwords are stored.
-		"""
-		return os.path.join(os.path.expanduser('~'), self.filename)
-
-	@abstractproperty
-	def filename(self):
-		"""The filename used to store the passwords.
-		"""
-		pass
-
-	@abstractmethod
-	def encrypt(self, password):
-		"""Encrypt the password.
-		"""
-		pass
-
-	@abstractmethod
-	def decrypt(self, password_encrypted):
-		"""Decrypt the password.
-		"""
-		pass
-
-	def get_password(self, service, username):
-		"""Read the password from the file.
-		"""
-		service = escape_for_ini(service)
-		username = escape_for_ini(username)
-
-		# load the passwords from the file
-		config = ConfigParser.RawConfigParser()
-		if os.path.exists(self.file_path):
-			config.read(self.file_path)
-
-		# fetch the password
-		try:
-			password_base64 = config.get(service, username).encode()
-			# decode with base64
-			password_encrypted = base64.decodestring(password_base64)
-			# decrypted the password
-			password = self.decrypt(password_encrypted).decode('utf-8')
-		except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-			password = None
-		return password
-
-	def set_password(self, service, username, password):
-		"""Write the password in the file.
-		"""
-		service = escape_for_ini(service)
-		username = escape_for_ini(username)
-
-		# encrypt the password
-		password_encrypted = self.encrypt(password.encode('utf-8'))
-		# load the password from the disk
-		config = ConfigParser.RawConfigParser()
-		if os.path.exists(self.file_path):
-			config.read(self.file_path)
-
-		# encode with base64
-		password_base64 = base64.encodestring(password_encrypted).decode()
-		# write the modification
-		if not config.has_section(service):
-			config.add_section(service)
-		config.set(service, username, password_base64)
-		config_file = open(self.file_path,'w')
-		config.write(config_file)
 
 class CryptedFileKeyring():
 	"""PyCrypto File Keyring"""

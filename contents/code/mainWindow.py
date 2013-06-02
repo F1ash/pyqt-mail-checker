@@ -302,6 +302,14 @@ class MainWindow(QWidget):
 		if hasattr(self.passwordManipulate, 'Keyring') :
 			self.Keyring = self.passwordManipulate.Keyring
 		else : self.Keyring = None
+		
+		self.Settings.sync()
+		self.accountList = string.split(self.Settings.value('Accounts').toString(),';')
+		self.accountCommand = {}
+		for accountName in self.accountList :
+			self.Settings.beginGroup(accountName)
+			self.accountCommand[accountName] = self.initValue('CommandLine', ' ')
+			self.Settings.endGroup()
 
 	def initPrefixAndSuffix(self):
 		self.initColourAndFont()
@@ -359,35 +367,47 @@ class MainWindow(QWidget):
 	def user_or_sys(self, path_):
 		return os.path.join(sys.path[0], path_)
 
-	def createDialogWidget(self):
-		self.scroll = QScrollArea()
-		self.scroll.setWidgetResizable(True)
-		self.scrolled = QWidget()
+	def createDialogItem(self, i):
+		self.label.append('')
+		self.countList.append('')
+
+		self.label[i] = QLabel()
+		self.countList[i] = QLabel()
+		self.label[i].setStyleSheet(self.accountColourStyle)
+		self.countList[i].setStyleSheet(self.countColourStyle)
+		self.Dialog.addWidget(self.label[i],i,0)
+		self.Dialog.addWidget(self.countList[i],i,1)
+
+	def createMailBoxDialog(self):
+		if hasattr(self, 'Dialog') :
+			while self.Dialog.count() :
+				child = self.Dialog.takeAt(0)
+				del child
+			del self.Dialog
+			del self.label
+			del self.countList
 		self.Dialog = QGridLayout()
 		i = 0
 		self.label = []
 		self.countList = []
-		for accountName in string.split(self.Settings.value('Accounts').toString(),';') :
-			self.label.append(accountName)
-			self.countList.append(accountName)
-
-			self.label[i] = QLabel()
-			self.countList[i] = QLabel()
-			self.label[i].setStyleSheet(self.accountColourStyle)
-			self.countList[i].setStyleSheet(self.countColourStyle)
+		for accountName in self.Settings.value('Accounts').toString().split(';') :
+			#print accountName.toLocal8Bit().data()
+			self.createDialogItem(i)
 			self.label[i].setToolTip(self.accTTPref + self.tr._translate('Account') + \
 													self.accTTSuff + ' ' + accountName)
-
-			self.Dialog.addWidget(self.label[i],i,0)
-			self.Dialog.addWidget(self.countList[i],i,1)
 			i += 1
+		if hasattr(self, 'scrolled') : del self.scrolled
+		self.scrolled = QWidget()
+		self.scrolled.setLayout(self.Dialog)
+		self.scroller.setWidget(self.scrolled)
 
+	def createDialogWidget(self):
+		self.scroller = QScrollArea()
+		self.scroller.setWidgetResizable(True)
+		self.createMailBoxDialog()
 		self.labelStat = QLabel()
 		self.labelStat.setText("<font color=red><b>" + self.tr._translate('..stopped..') + "</b></font>")
-		#self.Dialog.addWidget(self.labelStat, i, 0)
-		self.scrolled.setLayout(self.Dialog)
-		self.scroll.setWidget(self.scrolled)
-		self.layout.addWidget(self.scroll)
+		self.layout.addWidget(self.scroller)
 		self.layout.addWidget(self.labelStat)
 
 	def initSysTrayIcon(self):
@@ -481,14 +501,6 @@ class MainWindow(QWidget):
 			self.show_n_hide_messages()
 
 	def processInit(self):
-		self.Settings.sync()
-		self.accountList = string.split(self.Settings.value('Accounts').toString(),';')
-		self.accountCommand = {}
-		for accountName in self.accountList :
-			self.Settings.beginGroup(accountName)
-			self.accountCommand[accountName] = self.initValue('CommandLine', ' ')
-			self.Settings.endGroup()
-
 		self.initStat = True
 		self.someFunctions.initPOP3Cache()
 
@@ -531,11 +543,13 @@ class MainWindow(QWidget):
 			self.icon.setIconSize(self.getIconActualSize("mailChecker_web"))
 			self.icon.setIcon(QIcon.fromTheme("mailChecker_web"))
 			self.icon.setToolTip(self.headerPref + self.tr._translate('Mail\nChecking') +  self.headerSuff)
+			self.trayIcon.setIcon(QIcon.fromTheme("mailChecker_web"))
 			self.disableIconClick()
 		else:
 			self.labelStat.setText("<font color=red><b>" + self.tr._translate('..stopped..') + "</b></font>")
 			self.icon.setIconSize(self.getIconActualSize("mailChecker_stop"))
 			self.icon.setIcon(QIcon.fromTheme("mailChecker_stop"))
+			self.trayIcon.setIcon(QIcon.fromTheme("mailChecker_stop"))
 			return None
 
 		if self.checkAccess() :
@@ -544,11 +558,11 @@ class MainWindow(QWidget):
 				accData = []
 				for accountName in string.split(self.Settings.value('Accounts').toString(),';') :
 					self.Settings.beginGroup(accountName)
-					enable = self.Settings.value('Enabled').toString()
+					enabled = self.Settings.value('Enabled').toString()
 					connectMethod = self.Settings.value('connectMethod').toString()
 					self.Settings.endGroup()
 					#print dateStamp() , accountName.toLocal8Bit().data(), connectMethod, enable
-					if str(enable) == '1' :
+					if str(enabled) == '1' :
 						pswd = self.Keyring.get_password(accountName)
 						data = (accountName, pswd)
 						if connectMethod == 'imap\idle' :
@@ -607,6 +621,7 @@ class MainWindow(QWidget):
 			self.icon.setIcon(QIcon.fromTheme("mailChecker"))
 			self.icon.setToolTip(self.headerPref + self.tr._translate('Click for Start\Stop') + \
 																				self.headerSuff)
+			self.trayIcon.setIcon(QIcon.fromTheme("mailChecker"))
 		else :
 			noCheck = True
 			self.labelStat.setText("<font color=red><b>" + self.tr._translate('..stopped..') + "</b></font>")
@@ -614,6 +629,7 @@ class MainWindow(QWidget):
 			self.icon.setIcon(QIcon.fromTheme("mailChecker_stop"))
 			self.icon.setToolTip(self.headerPref + self.tr._translate('Click for Start\Stop') + \
 																				self.headerSuff)
+			self.trayIcon.setIcon(QIcon.fromTheme("mailChecker_stop"))
 
 		#print dateStamp() ,  self.checkResult, '  received Result\n', path_, self.labelStat.text()
 		i = 0
@@ -622,13 +638,27 @@ class MainWindow(QWidget):
 		x = ''
 		if not hasattr(self, 'accountList') : self.accountList = QStringList()
 		#for item in self.accountList : print item.toLocal8Bit().data(), 'accList'
+		count = len(self.label) - 1
 		for accountName in self.accountList :
 			self.Settings.beginGroup(accountName)
+			enabled = self.Settings.value('Enabled').toString()
 			connectMethod = self.Settings.value('connectMethod').toString()
 			self.Settings.endGroup()
 			IDLE = True if connectMethod == 'imap\idle' else False
+			DISABLED = True if enabled != '1' else False
 			try :
-				if int(self.checkResult[i][2]) > 0 and not IDLE :
+				if DISABLED :
+					if hasattr(self, 'label') and i>= count : self.createDialogItem(i)
+					accountName_ = self.accPref + accountName + self.accSuff
+					accountTT = self.accTTPref + self.tr._translate('Account') + \
+								self.accTTSuff + ' ' + accountName + \
+								self.tr._translate(' disabled')
+					text_1 = self.countPref + self.tr._translate('disabled') + \
+							 self.countSuff
+					text_2 = self.countTTPref + '<pre>' + \
+							 self.tr._translate('disabled') + \
+							 '</pre>' + self.countTTSuff
+				elif int(self.checkResult[i][2]) > 0 and not IDLE :
 					self.listNewMail += '<pre>' + accountName + '&#09;' + \
 										 str(self.checkResult[i][2]) + ' | ' + \
 										 str(self.checkResult[i][6]) + '</pre>'
@@ -657,7 +687,7 @@ class MainWindow(QWidget):
 							 str(self.checkResult[i][2]) + '</pre><pre>' + self.tr._translate('UnRead : ') + \
 							 str(self.checkResult[i][6]) + '</pre>' + self.countTTSuff
 
-				if not IDLE :
+				if not IDLE or DISABLED :
 					self.label[i].setText(accountName_)
 					self.label[i].setToolTip(accountTT)
 					self.countList[i].setText(text_1)
@@ -971,7 +1001,11 @@ class MainWindow(QWidget):
 		# refresh plasmoid Header
 		self.TitleDialog.setText(self.headerPref + self.title + self.headerSuff)
 		self.TitleDialog.setStyleSheet(self.headerColourStyle)
-		
+
+		# refresh MailBox Dialog
+		self.createMailBoxDialog()
+		self.setLayout(self.layout)
+
 		self.emit(SIGNAL('refresh'))
 		print dateStamp() , 'idleingStoppedEvent_1'
 
