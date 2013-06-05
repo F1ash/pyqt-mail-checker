@@ -20,35 +20,17 @@
 #  
 #
 
-import getpass
 import os
-import sys
 import string
 import ConfigParser
 import base64
 from os.path import join, expanduser, isfile
+from Utils.Functions import randomString
 
-#############
-#from keyring.util.escape import escape as escape_for_ini
-
-LEGAL_CHARS = ( getattr(string, 'letters', None) ) + string.digits
-
-ESCAPE_FMT = "_%02X"
-
-def _escape_char(c):
-    "Single char escape. Return the char, escaped if not already legal"
-    if isinstance(c, int):
-        c = unichr(c)
-    return c if c in LEGAL_CHARS else ESCAPE_FMT % ord(c)
-
-def escape_for_ini(value):
-    """
-    Escapes given string so the result consists of alphanumeric chars and
-    underscore only.
-    """
-    return "".join(_escape_char(c) for c in value.encode('utf-8'))
-#
-##############
+KEYRING_SETTING = 'keyring-setting'
+CRYPTED_PASSWORD = 'crypted-password'
+BLOCK_SIZE = 32
+PADDING = '\0'
 
 try:
 	import gnomekeyring as G
@@ -62,16 +44,11 @@ except ImportError:
 else:
 	kwallet_support = True
 
-_KEYRING_SETTING = 'keyring-setting'
-_CRYPTED_PASSWORD = 'crypted-password'
-_BLOCK_SIZE = 32
-_PADDING = '0'
-
 def to_unicode(obj):
-	if not isinstance(obj, basestring) and hasattr(obj, 'toLocal8Bit') :
-		return obj.toLocal8Bit().data()
-	elif not isinstance(obj, basestring) and hasattr(obj, 'toUtf8') :
+	if not isinstance(obj, basestring) and hasattr(obj, 'toUtf8') :
 		return obj.toUtf8().data()
+	elif not isinstance(obj, basestring) and hasattr(obj, 'toLocal8Bit') :
+		return obj.toLocal8Bit().data()
 	return obj
 
 class PasswordSetError(Exception):
@@ -87,19 +64,49 @@ class CryptedFileKeyring():
 		self.appletName = 'pyqt-mail-checker'
 		self.file_path = join(expanduser("~/.config"), self.appletName, self.filename)
 		self.prnt = parent
+		self.password = None
 
 	def open_Keyring(self):
-		allowed = False
-		if self.supported()>=0 :
-			try:
-				self._init_crypter()
-				allowed = True
-			except Exception, err :
-				print "[ In CryptedFileKeyring.open_Keyring() ]: ", err
-			finally : pass
+		allowed = None
+		try :
+			if self.supported()>=0 :
+				allowed = True if self._auth() else self.repeatAuth(allowed)
+			if not allowed : self.close_Keyring()
+		except Exception, err :
+			print "[ In CryptedFileKeyring.open_Keyring() ]: ", err
+		finally : pass
 		return allowed
 
-	def close_Keyring(self): pass
+	def repeatAuth(self, allowed, count = 0):
+		if not allowed and count < 3 :
+			self.password = None
+			result = self._check_file()
+			allowed = self.repeatAuth(result, count+1)
+		return allowed
+
+	def create_Keyring(self, _password = None):
+		self.password = to_unicode(_password)
+		# hash the password
+		import crypt
+		self.crypted_password = crypt.crypt(self.password, self.password)
+
+		# write down the initialization
+		config = ConfigParser.RawConfigParser()
+		config.add_section(KEYRING_SETTING)
+		config.set(KEYRING_SETTING, CRYPTED_PASSWORD, self.crypted_password)
+
+		config_file = open(self.file_path,'w')
+		config.write(config_file)
+
+		if config_file:
+			config_file.close()
+
+	def close_Keyring(self):
+		if self.password :
+			count = len(self.password)
+			self.password = randomString(count)
+			del self.password
+			self.password = None
 
 	def supported(self):
 		"""Applicable for all platforms, but not recommend"""
@@ -111,17 +118,18 @@ class CryptedFileKeyring():
 		return status
 
 	def has_entry(self, key, _folder = None):
-		folder = _folder if _folder else self.appletName
+		folder = to_unicode(_folder) if _folder else self.appletName
 		config = ConfigParser.RawConfigParser()
 		config.read(self.file_path)
-		return config.has_option(folder, to_unicode(key))
+		return config.has_option(to_unicode(key), folder)
 
 	def get_password(self, key, _folder = None):
 		#get_password(self, service, username):
 		"""Read the password from the file.
 		"""
-		service = escape_for_ini(service)
-		username = escape_for_ini(username)
+		folder = to_unicode(_folder) if _folder else self.appletName
+		service = to_unicode(key)
+		username = folder
 
 		# load the passwords from the file
 		config = ConfigParser.RawConfigParser()
@@ -137,14 +145,17 @@ class CryptedFileKeyring():
 			password = self.decrypt(password_encrypted).decode('utf-8')
 		except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
 			password = None
+		finally : pass
 		return password
 
-	def set_password(self, key, password, _folder = None):
+	def set_password(self, key, _password, _folder = None):
 		#set_password(self, service, username, password):
 		"""Write the password in the file.
 		"""
-		service = escape_for_ini(service)
-		username = escape_for_ini(username)
+		password = to_unicode(_password)
+		folder = to_unicode(_folder) if _folder else self.appletName
+		service = to_unicode(key)
+		username = folder
 
 		# encrypt the password
 		password_encrypted = self.encrypt(password.encode('utf-8'))
@@ -162,103 +173,69 @@ class CryptedFileKeyring():
 		config_file = open(self.file_path,'w')
 		config.write(config_file)
 
-	def _getpass(self, *args, **kwargs):
-		"""Wrap getpass.getpass(), so that we can override it when testing.
-		"""
-
-		return getpass.getpass(*args, **kwargs)
-
-	def _init_file(self):
-		"""Init the password file, set the password for it.
-		"""
-
-		password = None
-		while 1:
-			if not password:
-				password = self._getpass("Please set a password for your new keyring")
-				password2 = self._getpass('Password (again): ')
-				if password != password2:
-					sys.stderr.write("Error: Your passwords didn't match\n")
-					password = None
-					continue
-			if '' == password.strip():
-				# forbid the blank password
-				sys.stderr.write("Error: blank passwords aren't allowed.\n")
-				password = None
-				continue
-			if len(password) > _BLOCK_SIZE:
-				# block size of AES is less than 32
-				sys.stderr.write("Error: password can't be longer than 32.\n")
-				password = None
-				continue
-			break
-
-		# hash the password
-		import crypt
-		self.crypted_password = crypt.crypt(password, password)
-
-		# write down the initialization
-		config = ConfigParser.RawConfigParser()
-		config.add_section(_KEYRING_SETTING)
-		config.set(_KEYRING_SETTING, _CRYPTED_PASSWORD, self.crypted_password)
-
-		config_file = open(self.file_path,'w')
-		config.write(config_file)
-
 		if config_file:
 			config_file.close()
 
 	def _check_file(self):
 		"""Check if the password file has been init properly.
 		"""
+		result = None
 		if isfile(self.file_path):
 			config = ConfigParser.RawConfigParser()
 			config.read(self.file_path)
 			try:
-				self.crypted_password = config.get(_KEYRING_SETTING,
-													_CRYPTED_PASSWORD)
-				return self.crypted_password.strip() != ''
-			except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
-				pass
-		return False
+				self.crypted_password = config.get(KEYRING_SETTING,
+													CRYPTED_PASSWORD)
 
-	def _auth(self, password):
+			except (ConfigParser.NoSectionError, ConfigParser.NoOptionError), err:
+				print "[ In CryptedFileKeyring._check_file() ]: ", err
+			finally : pass
+			if self.crypted_password.strip() != '' :
+				if self.password is None :
+					self.prnt.getKeyringPassword()
+			else :
+				self.prnt.createKeyring("%s: %s not inited"%(self.name, self.appletName))
+		else :
+			self.prnt.createKeyring("%s: %s not inited"%(self.name, self.appletName))
+		result = self._auth()
+		return result
+
+	def _auth(self):
 		"""Return if the password can open the keyring.
 		"""
-		import crypt
-		return crypt.crypt(password, password) == self.crypted_password
+		if self.password and self.crypted_password :
+			import crypt
+			return crypt.crypt(self.password, self.password) == self.crypted_password
+		return None
 
 	def _init_crypter(self):
 		"""Init the crypter(using the password of the keyring).
 		"""
-		# check the password file
-		if not self._check_file():
-			self._init_file()
-
-		password = self._getpass("Please input your password for the keyring")
-
-		if not self._auth(password):
-			sys.stderr.write("Wrong password for the keyring.\n")
-			raise ValueError("Wrong password")
-
 		# init the cipher with the password
 		from Crypto.Cipher import AES
-		# pad to _BLOCK_SIZE bytes
-		password = password + (_BLOCK_SIZE - len(password) % _BLOCK_SIZE) * \
-																	_PADDING
-		return AES.new(password, AES.MODE_CFB)
+		# pad to BLOCK_SIZE bytes
+		password = self.passwordComplete(self.password)
+		# https://bugs.launchpad.net/pycrypto/+bug/997464/comments/2
+		return AES.new(password, AES.MODE_CFB, "\0"*16, segment_size=128)
 
-	def encrypt(self, password):
+	def passwordComplete(self, password):
+		return password + (BLOCK_SIZE - len(password) % BLOCK_SIZE) * PADDING
+
+	def encrypt(self, _password):
 		"""Encrypt the given password using the pycryto.
 		"""
+		password = to_unicode(_password)
 		crypter = self._init_crypter()
-		return crypter.encrypt(password)
+		return crypter.encrypt(self.passwordComplete(password))
 
-	def decrypt(self, password_encrypted):
+	def decrypt(self, _password_encrypted):
 		"""Decrypt the given password using the pycryto.
 		"""
+		password_encrypted = to_unicode(_password_encrypted)
 		crypter = self._init_crypter()
-		return crypter.decrypt(password_encrypted)
+		password = crypter.decrypt(password_encrypted)
+		while password.endswith(PADDING) : password = password[:-1]
+		return password
 
 class GnomeKeyring():
 	def __init__(self, parent = None):
@@ -273,7 +250,7 @@ class GnomeKeyring():
 			allowed = True
 			try :
 				if self.appletName not in _gnome_keyrings :
-					self.prnt.createKeyring("GnomeKeyring: %s doesn`t exist"%self.appletName)
+					self.prnt.createKeyring("%s: %s doesn`t exist"%(self.name, self.appletName))
 					return False
 				self.KEYRING_NAME = self.appletName
 			except Exception, err :

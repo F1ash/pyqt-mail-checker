@@ -20,14 +20,9 @@
 #  
 #  
 
-from PyQt4.QtGui import QComboBox, QWidget, QLabel, \
-						QVBoxLayout, QHBoxLayout, \
-						QPushButton, QIcon, QLineEdit, \
-						QMessageBox
-from PyQt4.QtCore import QStringList, Qt
+from PyQt4.QtGui import QComboBox, QWidget
 from Translator import Translator
-from PasswordEnter import PasswordEnter
-from KeyringStuff import *
+from PasswordEnter import *
 
 class PasswordManipulate(QWidget):
 	def __init__(self, obj = None, parent = None):
@@ -63,7 +58,6 @@ class PasswordManipulate(QWidget):
 		self.VBLayout.addWidget(self.currentKeyring)
 		self.VBLayout.addWidget(self.keyringInfo)
 
-		#self.VBLayout.addWidget(PasswordEnter('Create Keyring', self))
 		self.setLayout(self.VBLayout)
 		self.initKeyring()
 
@@ -80,15 +74,23 @@ class PasswordManipulate(QWidget):
 		self.Keyring = None if i<1 else KEYRING[i-1]
 
 	def saveData(self):
-		self.StateChanged = False
 		self.Settings.setValue("Keyring", self.currentKeyring.currentText())
+		self.StateChanged = False
 
-	def rejectChanges(self): self.initKeyring()
+	def rejectChanges(self):
+		self.initKeyring()
 
 	def createKeyring(self, msg = ''):
+		self.StateChanged = True
 		self.Parent.eventNotification(msg)
 		#
-		self.VBLayout.addWidget(PasswordEnter('Create Keyring', self))
-		self.setLayout(self.VBLayout)
-		self.Parent.showConfigurationInterface()
-		self.Parent.dialog.tabWidget.setCurrentWidget(self)
+		self.enterPassword = PasswordEnter('Create Keyring', self)
+		self.enterPassword.exec_()
+		del self.enterPassword
+		self.enterPassword = None
+
+	def getKeyringPassword(self):
+		self.enterPassword = PasswordEnter(self.Keyring.name, self, 0)
+		self.enterPassword.exec_()
+		del self.enterPassword
+		self.enterPassword = None

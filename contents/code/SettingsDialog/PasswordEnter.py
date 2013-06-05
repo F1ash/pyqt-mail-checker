@@ -20,34 +20,40 @@
 #  
 #  
 
-from PyQt4.QtGui import QWidget, QLabel, \
+from PyQt4.QtGui import QDialog, QLabel, \
 						QVBoxLayout, QHBoxLayout, \
 						QPushButton, QIcon, QLineEdit, \
 						QMessageBox
-from PyQt4.QtCore import QStringList, Qt
+from PyQt4.QtCore import QStringList, Qt, QTimer
+from KeyringStuff import *
 
-class PasswordEnter(QWidget):
-	def __init__(self, title = '', parent = None):
-		QWidget.__init__(self, parent)
+class PasswordEnter(QDialog):
+	def __init__(self, title = '', parent = None, mode = 1):
+		QDialog.__init__(self, parent)
 		self.prnt = parent
+		self.mode = mode
 		self.tr = self.prnt.tr
 		self.Sound = self.prnt.Parent.sound
 		self.Keyring = self.prnt.Keyring
 		self.title = QLabel(self.tr._translate(title))
 		self.title.setAlignment(Qt.AlignHCenter)
 		self.passwrd = QLineEdit()
+		self.passwrd.setMaxLength(BLOCK_SIZE)
 		self.passwrd.setPlaceholderText(self.tr._translate("Enter Password"))
 		self.passwrd.setEchoMode(QLineEdit.Password)
 		self.passwrd.setToolTip(self.tr._translate("Enter Password"))
-		self.confirm = QLineEdit()
-		self.confirm.setPlaceholderText(self.tr._translate("Confirm Password"))
-		self.confirm.setEchoMode(QLineEdit.Password)
-		self.confirm.setToolTip(self.tr._translate("Confirm it"))
+		if self.mode :
+			self.confirm = QLineEdit()
+			self.confirm.setMaxLength(BLOCK_SIZE)
+			self.confirm.setPlaceholderText(self.tr._translate("Confirm Password"))
+			self.confirm.setEchoMode(QLineEdit.Password)
+			self.confirm.setToolTip(self.tr._translate("Confirm it"))
 
 		self._layout = QVBoxLayout()
 		self._layout.addWidget(self.title)
 		self._layout.addWidget(self.passwrd)
-		self._layout.addWidget(self.confirm)
+		if self.mode :
+			self._layout.addWidget(self.confirm)
 		self.ok = QPushButton(QIcon.fromTheme("dialog-ok"), "", self)
 		self.cancel = QPushButton(QIcon.fromTheme("dialog-cancel"), "", self)
 		self.buttonLayout = QHBoxLayout()
@@ -55,37 +61,64 @@ class PasswordEnter(QWidget):
 		self.buttonLayout.addWidget(self.cancel)
 		self._layout.addItem(self.buttonLayout)
 		self.setLayout(self._layout)
-		self.ok.clicked.connect(self.checkCorrectOfPassword)
-		self.cancel.clicked.connect(self.clearKeyringCreation)
+		if self.mode :
+			self.ok.clicked.connect(self.checkCorrectOfPassword)
+		else :
+			self.ok.clicked.connect(self.returnPassword)
+		self.cancel.clicked.connect(self.clearEnterFields)
+		self.parentVisibilityState = \
+			(self.prnt.Parent.isVisible(), \
+			self.prnt.Parent.isMinimized(), \
+			self.prnt.Parent.isMaximized())
+		QTimer.singleShot(100, self.moveToTrayIcon)
+
+	def moveToTrayIcon(self):
+		self.move(self.prnt.Parent.mapToGlobal(self.prnt.Parent.trayIconMenu.pos()))
 
 	def checkCorrectOfPassword(self):
-		if self.confirm.text() == self.passwrd.text() :
+		if self.confirm.text() == self.passwrd.text() and \
+				not self.confirm.text().isEmpty() :
 			self.Keyring.create_Keyring(self.passwrd.text())
 			self.Sound.Complete.play()
 			QMessageBox.information(self, \
 					self.tr._translate("Create Keyring"), \
 					self.tr._translate("Keyring created."), \
 					1)
-			self.clearKeyringCreation()
-			self.deleteKeyringCreation()
+			self.clearEnterFields()
+			self.prnt.saveData()
+			self.done(0)
 		else :
 			self.Sound.Attention.play()
 			QMessageBox.information(self, \
 					self.tr._translate("Create Keyring"), \
-					self.tr._translate("Passwords mismatch"), \
+					self.tr._translate("Passwords mismatch or empty"), \
 					1)
-			self.clearKeyringCreation()
+			self.clearEnterFields()
 
-	def clearKeyringCreation(self):
+	def clearEnterFields(self):
 		self.passwrd.clear()
-		self.confirm.clear()
+		if self.mode :
+			self.confirm.clear()
 
-	def deleteKeyringCreation(self):
-		#while (item = self._layout.takeAt(0)) \
-		#			and item not in (0, None) :
-		#	del item
-		self.prnt.VBLayout.removeWidget(self)
-		self.close()
+	def returnPassword(self):
+		if not self.passwrd.text().isEmpty() :
+			self.prnt.Keyring.password = to_unicode(self.passwrd.text())
+			self.clearEnterFields()
+			self.close()
+		else :
+			self.Sound.Attention.play()
+			QMessageBox.information(self, \
+					self.tr._translate("Enter Password"), \
+					self.tr._translate("Passwords empty"), \
+					1)
 
-	#def eventClose(self, event):
-	#	self.prnt.done(0)
+	def closeEvent(self, ev):
+		#self.prnt.Parent.show()
+		ev.ignore()
+		if not self.parentVisibilityState[0] :
+			self.prnt.Parent.autoHide(3)
+		elif not self.parentVisibilityState[1] and not self.parentVisibilityState[2] :
+			self.prnt.Parent.showNormal()
+		elif self.parentVisibilityState[1] : self.prnt.Parent.showMinimized()
+		else : self.prnt.Parent.showMaximized()
+		self.done(0)

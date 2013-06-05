@@ -20,19 +20,19 @@
 #  
 #
 
-from PyQt4.QtGui import QWidget, QTabWidget, \
+from PyQt4.QtGui import QDialog, QTabWidget, \
 						QHBoxLayout, QVBoxLayout, \
 						QPushButton, QIcon, \
 						QSizePolicy
-from PyQt4.QtCore import Qt, QString, QEvent, pyqtSignal
+from PyQt4.QtCore import Qt, QString, QEvent, pyqtSignal, QTimer
 from Translator import Translator
 
-class PageDialog(QWidget):
+class PageDialog(QDialog):
 	okClicked = pyqtSignal()
 	cancelClicked = pyqtSignal()
 	settingsCancelled = pyqtSignal()
 	def __init__(self, obj, parent = None):
-		QWidget.__init__(self, parent)
+		QDialog.__init__(self, parent)
 		self.prnt = obj
 		self.tr = Translator()
 		self.setWindowTitle(self.tr._translate('M@il Checker : Settings'))
@@ -55,6 +55,10 @@ class PageDialog(QWidget):
 		self.restoreGeometry(self.prnt.Settings.value('SettingsGeometry').toByteArray())
 		self.parentVisibilityState = \
 		(self.prnt.isVisible(), self.prnt.isMinimized(), self.prnt.isMaximized())
+		QTimer.singleShot(100, self.moveToTrayIcon)
+
+	def moveToTrayIcon(self):
+		self.move(self.prnt.mapToGlobal(self.prnt.trayIconMenu.pos()))
 
 	def addPage(self, wdg, wdgName):
 		self.tabWidget.addTab(wdg, wdgName)
@@ -67,7 +71,7 @@ class PageDialog(QWidget):
 	def closeEvent(self, ev):
 		self.prnt.show()
 		self.prnt.Settings.setValue('SettingsGeometry', self.saveGeometry())
-		self.hide()
+		#self.hide()
 		ev.ignore()
 		if not self.parentVisibilityState[0] :
 			self.prnt.autoHide(3)
@@ -75,3 +79,4 @@ class PageDialog(QWidget):
 			self.prnt.showNormal()
 		elif self.parentVisibilityState[1] : self.prnt.showMinimized()
 		else : self.prnt.showMaximized()
+		self.done(0)

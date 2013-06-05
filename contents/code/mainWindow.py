@@ -724,12 +724,15 @@ class MainWindow(QWidget):
 				encoding = self.checkResult[i][5].split('\n')
 				STR_ = ''
 				numbers = self.checkResult[i][7].split()
+				numbers.reverse()
 				if str_ not in ['', ' ', '0'] :
 					#print dateStamp() ,  str_
 					j = 0
 					k = 0
 					groups = 0
-					for _str in str_.split('\r\n\r\n') :
+					msgAttributes = str_.split('\r\n\r\n')
+					msgAttributes.reverse()
+					for _str in msgAttributes :
 						if _str not in ['', ' ', '\n', '\t', '\r', '\r\n'] :
 							mailAttrStr = self.someFunctions.mailAttrToSTR(_str, encoding[j])
 							_str_raw = htmlWrapper(mailAttrStr, self.mailAttrColor)
@@ -791,6 +794,7 @@ class MainWindow(QWidget):
 		#print dateStamp() ,  'refresh out'
 
 	def createConfigurationInterface(self, parent):
+		print "create Set-s"
 		self.editAccounts = EditAccounts(self, parent)
 		parent.addPage(self.editAccounts, self.tr._translate("Accounts"))
 		self.appletSettings = AppletSettings(self, parent)
@@ -814,8 +818,8 @@ class MainWindow(QWidget):
 			self.dialog = PageDialog(self)
 			self.createConfigurationInterface(self.dialog)
 			if not key :
-				self.dialog.show()
-				self.dialog.move(self.mapToGlobal(self.trayIconMenu.pos()))
+				self.dialog.exec_()
+				#self.dialog.move(self.mapToGlobal(self.trayIconMenu.pos()))
 
 	def settingsChangeComplete(self):
 		if self.editAccounts.StateChanged :
@@ -1108,7 +1112,10 @@ class MainWindow(QWidget):
 				k = 0
 				groups = 0
 				numbers = d['msg'][4].split()
-				for _str in string.split(d['msg'][3], '\r\n\r\n') :
+				numbers.reverse()
+				msgAttributes = string.split(d['msg'][3], '\r\n\r\n')
+				msgAttributes.reverse()
+				for _str in msgAttributes :
 					if _str not in ['', ' ', '\n', '\t', '\r', '\r\n'] :
 						mailAttrStr = self.someFunctions.mailAttrToSTR(_str)
 						_str_raw = htmlWrapper(mailAttrStr, self.mailAttrColor)
