@@ -794,7 +794,6 @@ class MainWindow(QWidget):
 		#print dateStamp() ,  'refresh out'
 
 	def createConfigurationInterface(self, parent):
-		print "create Set-s"
 		self.editAccounts = EditAccounts(self, parent)
 		parent.addPage(self.editAccounts, self.tr._translate("Accounts"))
 		self.appletSettings = AppletSettings(self, parent)
@@ -817,9 +816,10 @@ class MainWindow(QWidget):
 		if not hasattr(self, 'dialog') or self.dialog is None :
 			self.dialog = PageDialog(self)
 			self.createConfigurationInterface(self.dialog)
-			if not key :
-				self.dialog.exec_()
-				#self.dialog.move(self.mapToGlobal(self.trayIconMenu.pos()))
+		if not key :
+			self.dialog.exec_()
+		else :
+			self.dialog.showNormal()
 
 	def settingsChangeComplete(self):
 		if self.editAccounts.StateChanged :
@@ -874,14 +874,13 @@ class MainWindow(QWidget):
 			else :
 				self.showConfigurationInterface(True)
 				self.dialog.tabWidget.setCurrentWidget(self.passwordManipulate)
-				self.dialog.show()
-				self.dialog.move(self.mapToGlobal(self.trayIconMenu.pos()))
+				self.dialog.exec_()
 		return False
 
 	def configAccepted(self):
 		self.disconnect(self, SIGNAL('refresh'), self.refreshData)
 		if self.Keyring is None and self.passwordManipulate.StateChanged \
-				and self.passwordManipulate.Keyring is not None :
+				and self.passwordManipulate.getProposedKeyring() is not None :
 			self.continueReset()
 		elif self.Keyring is not None and self.checkAccess() :
 			self.continueReset()
@@ -902,7 +901,7 @@ class MainWindow(QWidget):
 			self.disconnect(self.dialog, SIGNAL("okClicked()"), self.configAccepted)
 			self.disconnect(self.dialog, SIGNAL("cancelClicked()"), self.configDenied)
 			self.disconnect(self.dialog, SIGNAL('settingsCancelled()'), self.passwordManipulate.initKeyring)
-			self.dialog.close()
+			self.dialog._close()
 			del self.dialog
 			self.dialog = None
 

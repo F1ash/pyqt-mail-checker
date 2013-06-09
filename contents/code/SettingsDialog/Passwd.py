@@ -71,10 +71,15 @@ class PasswordManipulate(QWidget):
 	def stateChanged(self, i=0):
 		self.StateChanged = True
 		self.keyringInfo.setText("INFO: %s" % self.currentKeyring.itemData(i).toString())
-		self.Keyring = None if i<1 else KEYRING[i-1]
+
+	def getProposedKeyring(self):
+		i = self.currentKeyring.currentIndex()
+		return None if i<1 else KEYRING[i-1]
 
 	def saveData(self):
 		self.Settings.setValue("Keyring", self.currentKeyring.currentText())
+		self.Keyring = self.getProposedKeyring()
+		self.Parent.Keyring = self.Keyring
 		self.StateChanged = False
 
 	def rejectChanges(self):

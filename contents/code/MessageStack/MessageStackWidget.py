@@ -12,8 +12,6 @@ class MessageStackWidget(QWidget):
 		self.prnt = obj
 		self.setWindowTitle(self.prnt.tr._translate('M@il Checker : Stack'))
 		self.mutex = QMutex()
-		self.parentVisibilityState = \
-		(self.prnt.isVisible(), self.prnt.isMinimized(), self.prnt.isMaximized())
 
 		self.stack = QWidget()
 		self.scroll = QScrollArea()
@@ -84,23 +82,16 @@ class MessageStackWidget(QWidget):
 		if _key in self.MessageStack.iterkeys() : del self.MessageStack[_key]
 		#print "MessageStack least:", [item for item in self.MessageStack.iterkeys()]
 		count = self.stackLayout.count()
-		if not count :
-			#self.prnt.clearJob.emit("***ALL***")
-			self.parentVisibilityState = \
-			(self.prnt.isVisible(), self.prnt.isMinimized(), self.prnt.isMaximized())
-			if not self.parentVisibilityState[0] : self.prnt.showMinimized()
-			self.close()
+		if not count : self.close()
 
 	def _show(self):
-		self.stack.show()
 		self.show()
 
 	def closeEvent(self, ev):
-		self.hide()
 		ev.ignore()
-		if not self.parentVisibilityState[0] :
+		if not self.prnt.isVisible() :
+			self.prnt.show()
 			self.prnt.autoHide(3)
-		elif not self.parentVisibilityState[1] and not self.parentVisibilityState[2] :
+		if self.prnt.isMinimized() :
 			self.prnt.showNormal()
-		elif self.parentVisibilityState[1] : self.prnt.showMinimized()
-		else : self.prnt.showMaximized()
+		self.hide()

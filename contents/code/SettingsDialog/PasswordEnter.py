@@ -66,10 +66,6 @@ class PasswordEnter(QDialog):
 		else :
 			self.ok.clicked.connect(self.returnPassword)
 		self.cancel.clicked.connect(self.clearEnterFields)
-		self.parentVisibilityState = \
-			(self.prnt.Parent.isVisible(), \
-			self.prnt.Parent.isMinimized(), \
-			self.prnt.Parent.isMaximized())
 		QTimer.singleShot(100, self.moveToTrayIcon)
 
 	def moveToTrayIcon(self):
@@ -86,7 +82,7 @@ class PasswordEnter(QDialog):
 					1)
 			self.clearEnterFields()
 			self.prnt.saveData()
-			self.done(0)
+			self.close()
 		else :
 			self.Sound.Attention.play()
 			QMessageBox.information(self, \
@@ -113,12 +109,10 @@ class PasswordEnter(QDialog):
 					1)
 
 	def closeEvent(self, ev):
-		#self.prnt.Parent.show()
 		ev.ignore()
-		if not self.parentVisibilityState[0] :
+		if not self.prnt.Parent.isVisible() :
+			self.prnt.Parent.show()
 			self.prnt.Parent.autoHide(3)
-		elif not self.parentVisibilityState[1] and not self.parentVisibilityState[2] :
+		if self.prnt.Parent.isMinimized() :
 			self.prnt.Parent.showNormal()
-		elif self.parentVisibilityState[1] : self.prnt.Parent.showMinimized()
-		else : self.prnt.Parent.showMaximized()
 		self.done(0)

@@ -237,6 +237,8 @@ class CryptedFileKeyring():
 		while password.endswith(PADDING) : password = password[:-1]
 		return password
 
+# TODO : MateKeyring
+
 class GnomeKeyring():
 	def __init__(self, parent = None):
 		self.name = 'GnomeKeyring'
