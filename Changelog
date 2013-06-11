@@ -1,2 +1,5 @@
 v.1.12.55:
 begin remake kde-plasma-mail-checker-1.12.55 to kdelib-less pyqt-applet;
+
+v.2.0.0:
+release accomplish;

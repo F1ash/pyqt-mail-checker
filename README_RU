@@ -7,29 +7,27 @@
 	/tmp/outMailChecker_%Y_%m_%d_%H:%M:%S.log
 
 Путь к файлу конфигурации апплета:
-	~/.config/plasmaMailChecker/plasmaMailChecker.conf
+	~/.config/pyqt-mail-checker/pyqt-mail-checker.conf
 
 Путь к файлам фильтров:
-	~/.config/plasmaMailChecker/filter.from
-	~/.config/plasmaMailChecker/filter.subj
+	~/.config/pyqt-mail-checker/filter.from
+	~/.config/pyqt-mail-checker/filter.subj
 
 Путь к кешу uidl POP3 аккаунтов:
-	~/.cache/plasmaMailChecker/<accountName>.cache
+	~/.cache/pyqt-mail-checker/<accountName>.cache
 	к временному:
 	/dev/shm/<accountName>.cache
 
+Путь к LockFile: /tmp/pyqt-mail-checker.lock
+
 Для останова\запуска апплета кликнике иконку "письмо".
-M@ilChecker использует бумажник умолчанию или альтернативныq, если он указан.
 
 Описание:
-	Плазмоид периодически проверяет наличие новых писем
+	Апплет периодически проверяет наличие новых писем
 	(с момента последней проверки) в списке почтовых ящиков.
 	Поддерживаются POP3\IMAP4(+IDLE) протоколы с None\SSL аутентификацией.
-	Пароли к почтовым ящикам содержатся в зашифрованном виде.
-	Апплет периодически проверяет наличие новых писем
-	в списке почтовых ящиков.
-	Поддерживаются POP3\IMAP4(+IDLE) протоколы с None\SSL аутентификацией.
-	Пароли к почтовым ящикам содержатся в зашифрованном виде.
+	Пароли к почтовым ящикам содержатся в зашифрованном виде
+	(KWallet / Gnome Keyring / Crypto File).
 	Есть встроенный предпросмотр почты с возможностью
 	быстрого ответа и пересылки.
 Замечания:
@@ -41,4 +39,4 @@ M@ilChecker использует бумажник умолчанию или ал
 	(Например: ru.qm, de.qm, ge.qm). По умолчанию, язык английский.
 
 Тестировано на :
-	Fedora18
+	Fedora18-19

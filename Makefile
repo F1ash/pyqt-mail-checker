@@ -1,7 +1,7 @@
 # NAME
 APP_NAME=pyqt-mail-checker
 #VERSION
-VERSION=1.12.55
+VERSION=`cat ./VERSION`
 
 #PATH
 DESTDIR=/usr

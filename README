@@ -3,24 +3,25 @@
 Paths and files:
 	Error log file: $HOME/.xsession-errors
 	Debug log file: /tmp/outMailChecker_%Y_%m_%d_%H:%S.log
-	Configuration file: $HOME/.config/plasmaMailChecker/plasmaMailChecker.conf
-	Filter files: $HOME/.config/plasmaMailChecker/filter.from,
-		$HOME/.config/plasmaMailChecker/filter.subj
+	Configuration file: $HOME/.config/pyqt-mail-checker/pyqt-mail-checker.conf
+	Filter files: $HOME/.config/pyqt-mail-checker/filter.from,
+		$HOME/.config/pyqt-mail-checker/filter.subj
+	Lock file: /tmp/pyqt-mail-checker.lock
 
 Path for your POP3 accounts uidl cache:
-		$HOME/.cache/plasmaMailChecker/<accountName>.cache
+		$HOME/.cache/pyqt-mail-checker/<accountName>.cache
 	temporary cache:
 		/dev/shm/<accountName>.cache
 
-Start/stop mail checking in plasmoid.
+Start/stop mail checking in Applet.
 	Click on mailers icon to start or stop checking.
-M@ilChecker uses default wallet or an alternative, if specified.
 
 Description:
 	Applet should periodic check for new messages in configured accounts.
 	Supported protocols: POP3/POP3S/IMAP4/IMAP4S + IMAP4_IDLE.
-	Passwords for accounts stored in encrypted container.
-	Support integrated mail viewer (for non-Akonadi accounts).
+	Passwords for accounts stored in encrypted container
+	(KWallet / Gnome Keyring / Crypto File).
+	Support integrated mail viewer.
 	See for : EXAMPLES.
 Notes:
 	In Applet built Translator with autodetect of locale. Installation
@@ -30,4 +31,4 @@ Notes:
 Known issues:
 	If you internet connection is too slow, you need increase time value in "Autoexit of connect" parameter.
 
-Tested Fedora18
+Tested Fedora18-19
