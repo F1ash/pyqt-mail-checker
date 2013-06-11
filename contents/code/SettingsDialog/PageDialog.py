@@ -55,7 +55,6 @@ class PageDialog(QDialog):
 		QTimer.singleShot(100, self.moveToTrayIcon)
 
 	def moveToTrayIcon(self):
-		#self.move(self.prnt.mapToGlobal(self.prnt.trayIconMenu.pos()))
 		self.restoreGeometry(self.prnt.Settings.value('SettingsGeometry').toByteArray())
 
 	def addPage(self, wdg, wdgName):

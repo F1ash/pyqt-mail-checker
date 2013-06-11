@@ -67,6 +67,7 @@ class MainWindow(QWidget):
 		self.listNewMail = []
 		self.connectIconsFlag = False
 		self.appletName = 'pyqt-mail-checker'
+		self.lockFile = os.path.join("/tmp", self.appletName + '.lock')
 		self.tr = Translator()
 		self.setWindowTitle(self.tr._translate('M@il Checker'))
 		self.Settings = QSettings(self.appletName, self.appletName)
@@ -76,6 +77,20 @@ class MainWindow(QWidget):
 		self.initPrefixAndSuffix()
 		self.initWorkParameters()
 		self.init()
+
+	def lock(self):
+		if not self.isLocked() :
+			with open(self.lockFile, 'w') as f :
+				f.write( str(os.getpid()) )
+			return True
+		return False
+
+	def unlock(self):
+		if self.isLocked() :
+			os.remove(self.lockFile)
+
+	def isLocked(self):
+		return os.path.exists(self.lockFile)
 
 	def init(self):
 		self.T = ThreadCheckMail(self)
@@ -94,15 +109,18 @@ class MainWindow(QWidget):
 		self.viewJob.connect(self.mailViewJobUp)
 		self.clearJob.connect(self.mailViewJobClean)
 
-		AutoRun = self.initValue('AutoRun')
-		if AutoRun != '0' :
-			#QApplication.postEvent(self, QEvent(QEvent.User))
-			self.Timer1 = QTimer()
-			self.Timer1.setSingleShot(True)
-			self.Timer1.timeout.connect(self.enterPassword)
-			self.Timer1.start(2000)
-		if self.SoundEnabled :
-			self.sound.AppletStarted.play()
+		self.locked = self.lock()
+		if not self.locked : self.eventClose()
+		else :
+			AutoRun = self.initValue('AutoRun')
+			if AutoRun != '0' :
+				#QApplication.postEvent(self, QEvent(QEvent.User))
+				self.Timer1 = QTimer()
+				self.Timer1.setSingleShot(True)
+				self.Timer1.timeout.connect(self.enterPassword)
+				self.Timer1.start(2000)
+			if self.SoundEnabled :
+				self.sound.AppletStarted.play()
 
 	def initMainWindow(self):
 		self.initMainWindowLayout()
@@ -962,6 +980,7 @@ class MainWindow(QWidget):
 			print dateStamp() , "MailChecker destroyed manually."
 			#sys.stderr.close()
 			sys.stdout.close()
+			if self.locked : self.unlock()
 		self.closeFlag = False
 		if self.SoundEnabled :
 			self.sound.AppletClosed.finished.connect(self.close)
