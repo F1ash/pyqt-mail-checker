@@ -31,6 +31,6 @@ rpmbuild -ba $APP_NAME.spec
 
 # install
 cd ~/rpmbuild/RPMS/noarch
-su -c 'yum -y reinstall ./pyqt-mail-checker-*.rpm'
+su -c 'yum -y reinstall ./pyqt-mail-checker-'$APP_VERSION'*.rpm'
 cd ~
 #########

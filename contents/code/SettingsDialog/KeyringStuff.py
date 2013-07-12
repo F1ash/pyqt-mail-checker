@@ -297,7 +297,7 @@ class GnomeKeyring():
 
 	def get_password(self, key, _folder = None):
 		if not G.is_available() : return None
-		folder = _folder if _folder else self.appletName
+		folder = to_unicode(_folder) if _folder else self.appletName
 		item_list = G.list_item_ids_sync(self.appletName)
 		password = None
 		# ♿ ☟ GnomeKeyring is glitch at find_network_password_sync
@@ -324,7 +324,7 @@ class GnomeKeyring():
 		if not G.is_available() :
 			self.prnt.Parent.eventNotification("%s not available." % self.name)
 			return None
-		folder = _folder if _folder else self.appletName
+		folder = to_unicode(_folder) if _folder else self.appletName
 		try:
 			G.item_create_sync(
 				self.KEYRING_NAME, G.ITEM_NETWORK_PASSWORD,
@@ -373,6 +373,7 @@ class KDEKWallet():
 		return False
 
 	def get_password(self, key, _folder = None):
+		# KWallet use an Qt-based strings, to_unicode don`t required
 		folder = _folder if _folder else self.appletName
 		if hasattr(self, 'wallet') and not(self.wallet is None) :
 			if self.wallet.keyDoesNotExist(KWallet.Wallet.LocalWallet(), folder, key):
@@ -382,6 +383,7 @@ class KDEKWallet():
 			return result
 
 	def set_password(self, key, password = None, folder = None):
+		# KWallet use an Qt-based strings, to_unicode don`t required
 		if hasattr(self, 'wallet') and not(self.wallet is None) :
 			if key :
 				self.setFolder(folder if folder else self.appletName)

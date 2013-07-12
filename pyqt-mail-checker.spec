@@ -1,5 +1,5 @@
 Name: pyqt-mail-checker
-Version: 2.0.0
+Version: 2.0.1
 Release: 1%{?dist}
 Summary: Tray applet for periodically checking a new messages in the mailboxes list
 Summary(ru): Апплет периодически проверяет наличие новых писем в списке почтовых ящиков
@@ -20,7 +20,7 @@ Applet should periodic check for new messages in configured accounts.
 Supported protocols: POP3/POP3S/IMAP4/IMAP4S + IMAP4_IDLE.
 Passwords for accounts stored in encrypted container
 (KWallet / Gnome Keyring / Crypto File).
-Support integrated mail viewer.
+Support integrated mail viewer with quick answer & forward mail.
 
 %description -l ru
 %{name}
@@ -48,6 +48,9 @@ make install DESTDIR=$RPM_BUILD_ROOT/usr
 %doc README README_RU COPYING Changelog Licenses
 
 %changelog
+* Fri Jul 12 2013 Fl@sh <kaperang07@gmail.com> - 2.0.1-1
+- version updated
+
 * Tue Jun 11 2013 Fl@sh <kaperang07@gmail.com> - 2.0.0-1
 - version updated
 

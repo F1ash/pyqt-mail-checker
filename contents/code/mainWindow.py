@@ -322,7 +322,7 @@ class MainWindow(QWidget):
 		else : self.Keyring = None
 		
 		self.Settings.sync()
-		self.accountList = string.split(self.Settings.value('Accounts').toString(),';')
+		self.accountList = self.Settings.value('Accounts').toString().split(';')
 		self.accountCommand = {}
 		for accountName in self.accountList :
 			self.Settings.beginGroup(accountName)
@@ -574,12 +574,12 @@ class MainWindow(QWidget):
 			if not self.T.isRunning() :
 				#print dateStamp() ,  'start'
 				accData = []
-				for accountName in string.split(self.Settings.value('Accounts').toString(),';') :
+				for accountName in self.Settings.value('Accounts').toString().split(';') :
 					self.Settings.beginGroup(accountName)
 					enabled = self.Settings.value('Enabled').toString()
 					connectMethod = self.Settings.value('connectMethod').toString()
 					self.Settings.endGroup()
-					#print dateStamp() , accountName.toLocal8Bit().data(), connectMethod, enable
+					#print dateStamp() , accountName.toLocal8Bit().data(), connectMethod, enabled
 					if str(enabled) == '1' :
 						pswd = self.Keyring.get_password(accountName)
 						data = (accountName, pswd)
@@ -878,6 +878,7 @@ class MainWindow(QWidget):
 					 self.tr._translate('Cancel'))
 			if not answer : self.passwordManipulate.saveData()
 			else : self.passwordManipulate.rejectChanges()
+		self.Settings.sync()
 
 	def checkAccess(self):
 		if self.Keyring :
@@ -977,6 +978,7 @@ class MainWindow(QWidget):
 			self.GeneralLOCK.unlock()
 			count = self.initValue('stayDebLog', '5')
 			cleanDebugOutputLogFiles(int(count))
+			self.Settings.sync()
 			print dateStamp() , "MailChecker destroyed manually."
 			#sys.stderr.close()
 			sys.stdout.close()
