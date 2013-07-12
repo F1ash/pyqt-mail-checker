@@ -42,9 +42,9 @@ make install DESTDIR=$RPM_BUILD_ROOT/usr
 
 %files
 %{_bindir}/%{name}.py
-%{_desktopdir}/%{name}.desktop
+%{_datadir}/applications/%{name}.desktop
 %{_datadir}/%{name}
-%{_iconsdir}/hicolor/32x32/apps/mailChecker*
+%{_datadir}/icons/hicolor/32x32/apps/mailChecker*
 %doc README README_RU COPYING Changelog Licenses
 
 %changelog
