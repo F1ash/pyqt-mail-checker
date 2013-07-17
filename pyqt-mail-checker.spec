@@ -1,6 +1,6 @@
 Name: pyqt-mail-checker
 Version: 2.0.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Tray applet for periodically checking a new messages in the mailboxes list
 Summary(ru): Апплет периодически проверяет наличие новых писем в списке почтовых ящиков
 Group: Applications/Internet
@@ -13,6 +13,8 @@ Requires: python-SocksiPy, python-mailer, python-crypto
 Requires: PyQt4, sound-theme-freedesktop
 # for building the translator`s dictionary
 BuildRequires: qt4-devel
+# for update the icon cache
+BuildRequires: desktop-file-utils
 
 %description
 %{name}
@@ -36,9 +38,10 @@ Support integrated mail viewer with quick answer & forward mail.
 %setup -q
 
 %build
+# nothing to build
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT/usr
+make install DESTDIR=$RPM_BUILD_ROOT/%{_prefix}
 
 %files
 %{_bindir}/%{name}.py
@@ -47,7 +50,23 @@ make install DESTDIR=$RPM_BUILD_ROOT/usr
 %{_datadir}/icons/hicolor/32x32/apps/mailChecker*
 %doc README README_RU COPYING Changelog Licenses
 
+%post
+/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
+
+%postun
+if [ $1 -eq 0 ] ; then
+    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
+    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+fi
+
+%posttrans
+/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+
 %changelog
+* Wed Jul 17 2013 Fl@sh <kaperang07@gmail.com> - 2.0.1-2
+- added the icon-cache-update scriptlet with build require;
+- release number changed
+
 * Fri Jul 12 2013 Fl@sh <kaperang07@gmail.com> - 2.0.1-1
 - version updated
 
