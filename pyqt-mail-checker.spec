@@ -1,6 +1,6 @@
 Name: pyqt-mail-checker
 Version: 2.0.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Tray applet for periodically checking a new messages in the mailboxes list
 Summary(ru): Апплет периодически проверяет наличие новых писем в списке почтовых ящиков
 Group: Applications/Internet
@@ -13,7 +13,7 @@ Requires: python-SocksiPy, python-mailer, python-crypto
 Requires: PyQt4, sound-theme-freedesktop
 # for building the translator`s dictionary
 BuildRequires: qt4-devel
-# for update the icon cache
+# for validate the .desktop file
 BuildRequires: desktop-file-utils
 
 %description
@@ -42,6 +42,7 @@ Support integrated mail viewer with quick answer & forward mail.
 
 %install
 make install DESTDIR=$RPM_BUILD_ROOT/%{_prefix}
+desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 
 %files
 %{_bindir}/%{name}.py
@@ -63,6 +64,10 @@ fi
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 %changelog
+* Wed Jul 17 2013 Fl@sh <kaperang07@gmail.com> - 2.0.1-3
+- added the desktop-file-validate scriptlet;
+- release number changed
+
 * Wed Jul 17 2013 Fl@sh <kaperang07@gmail.com> - 2.0.1-2
 - added the icon-cache-update scriptlet with build require;
 - release number changed
