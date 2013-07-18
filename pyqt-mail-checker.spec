@@ -1,6 +1,6 @@
 Name: pyqt-mail-checker
 Version: 2.0.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Tray applet for periodically checking a new messages in the mailboxes list
 Summary(ru): Апплет периодически проверяет наличие новых писем в списке почтовых ящиков
 Group: Applications/Internet
@@ -41,7 +41,7 @@ Support integrated mail viewer with quick answer & forward mail.
 # nothing to build
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT/%{_prefix}
+make install DESTDIR=%{buildroot}/%{_prefix}
 desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 
 %files
@@ -64,6 +64,10 @@ fi
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 %changelog
+* Thu Jul 18 2013 Fl@sh <kaperang07@gmail.com> - 2.0.1-4
+- fixed install tag to macros-style;
+- release number changed
+
 * Wed Jul 17 2013 Fl@sh <kaperang07@gmail.com> - 2.0.1-3
 - added the desktop-file-validate scriptlet;
 - release number changed
