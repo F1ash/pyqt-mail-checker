@@ -17,12 +17,12 @@ Start/stop mail checking in Applet.
 	Click on mailers icon to start or stop checking.
 
 Description:
-	Applet should periodic check for new messages in configured accounts.
+	Applet should periodic check for new messages in configured accounts
+	and show mail headers in notification.
 	Supported protocols: POP3/POP3S/IMAP4/IMAP4S + IMAP4_IDLE.
 	Passwords for accounts stored in encrypted container
 	(KWallet / Gnome Keyring / Crypto File).
 	Support integrated mail viewer quick answer & forward mail.
-	See for : EXAMPLES.
 Notes:
 	In Applet built Translator with autodetect of locale. Installation
 	new language simply by adding the appropriate *.qm file.

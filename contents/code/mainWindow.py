@@ -983,10 +983,10 @@ class MainWindow(QWidget):
 			#sys.stderr.close()
 			sys.stdout.close()
 			if self.locked : self.unlock()
+			if self.SoundEnabled :
+				self.sound.AppletClosed.finished.connect(self.close)
+				self.sound.AppletClosed.play()
 		self.closeFlag = False
-		if self.SoundEnabled :
-			self.sound.AppletClosed.finished.connect(self.close)
-			self.sound.AppletClosed.play()
 
 	def closeEvent(self, ev):
 		if self.closeFlag and ev.type()==QEvent.Close :
