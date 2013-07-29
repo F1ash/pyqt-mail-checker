@@ -17,7 +17,6 @@ BuildRequires: qt4-devel
 BuildRequires: desktop-file-utils
 
 %description
-%{name}
 Applet should periodic check for new messages in configured accounts
 and show mail headers in notification.
 Supported protocols: POP3/POP3S/IMAP4/IMAP4S + IMAP4_IDLE.
@@ -26,7 +25,6 @@ Passwords for accounts stored in encrypted container
 Support integrated mail viewer with quick answer & forward mail.
 
 %description -l ru
-%{name}
 Апплет периодически проверяет наличие новых писем
 (с момента последней проверки) в списке почтовых ящиков
 и показывает заголовки новой почты в нотификации.
@@ -66,7 +64,7 @@ fi
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 %changelog
-* Mon Jul 22 2013 Fl@sh <kaperang07@gmail.com> - 2.0.2-1
+* Mon Jul 29 2013 Fl@sh <kaperang07@gmail.com> - 2.0.2-1
 - description extended;
 - version updated
 
