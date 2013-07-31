@@ -29,7 +29,7 @@ install: build
 	# *.desktop
 	$(INSTALL) $(APP_NAME).desktop $(DESKTOP)$(APP_NAME).desktop
 	# EXEC
-	$(INSTALL_EXEC) $(APP_NAME).py $(EXEC)$(APP_NAME).py
+	$(INSTALL_EXEC) $(APP_NAME) $(EXEC)$(APP_NAME)
 	# SOURCE
 	$(INSTALL) VERSION $(APP)VERSION
 	cp -pr $(CODE)/* $(APP)

@@ -4,6 +4,6 @@ GenericName=Multiprotocol Mail Agent
 Type=Application
 Categories=Network;Email;Qt;
 Icon=mailChecker.png
-Exec=pyqt-mail-checker.py
+Exec=pyqt-mail-checker
 Terminal=false
 StartupNotify=true

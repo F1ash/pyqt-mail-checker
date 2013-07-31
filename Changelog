@@ -9,3 +9,4 @@ some improvements;
 
 v.2.0.2:
 some improvements;
+fixed spec, __init__-files, binary file name for build;
