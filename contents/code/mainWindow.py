@@ -531,8 +531,9 @@ class MainWindow(QWidget):
 		if len(id_of_new_Items) :
 			self.MailProgExecList[jobID] = MailProgExec(self, id_of_new_Items, command, self)
 		self.MessageStackWidget.newMessage(str_, jobID, self.msgLifeTime)
-		self.MessageStackWidget._show()
-		self.MessageStackWidget.move(self.mapToGlobal(self.trayIconMenu.pos()))
+		if not self.MessageStackWidget.isVisible() :
+			self.MessageStackWidget._show()
+			self.MessageStackWidget.move(self.mapToGlobal(self.trayIconMenu.pos()))
 
 	def mailViewJobUp(self, key = ''):
 		_key = str(key)

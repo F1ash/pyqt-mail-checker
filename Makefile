@@ -4,9 +4,9 @@ APP_NAME=pyqt-mail-checker
 VERSION=`cat ./VERSION`
 
 #PATH
-DESTDIR=/usr
-APPS_DIR=$(DESTDIR)/share/
-EXEC=$(DESTDIR)/bin/
+PREFIX=/usr
+APPS_DIR=$(DESTDIR)$(PREFIX)/share/
+EXEC=$(DESTDIR)$(PREFIX)/bin/
 APP=$(APPS_DIR)$(APP_NAME)/
 DESKTOP=$(APPS_DIR)applications/
 APP_DOC=$(APPS_DIR)doc/$(APP_NAME)-$(VERSION)/
@@ -37,7 +37,6 @@ install: build
 	cp -p $(ICONS)/mailChecker* $(APP_ICONS)
 	# prepare DOCS
 	cp -p $(ICONS)/Licenses .
-	# tree $(DESTDIR)
 
 clean:
 	rm -rf $(DESKTOP)$(APP_NAME).desktop

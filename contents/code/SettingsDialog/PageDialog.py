@@ -52,9 +52,9 @@ class PageDialog(QDialog):
 		self.setMinimumWidth(100)
 		self.ok.clicked.connect(self.accepted)
 		self.cancel.clicked.connect(self.rejected)
-		QTimer.singleShot(100, self.moveToTrayIcon)
+		QTimer.singleShot(100, self._restoreGeometry)
 
-	def moveToTrayIcon(self):
+	def _restoreGeometry(self):
 		self.restoreGeometry(self.prnt.Settings.value('SettingsGeometry').toByteArray())
 
 	def addPage(self, wdg, wdgName):

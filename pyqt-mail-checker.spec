@@ -41,7 +41,7 @@ Support integrated mail viewer with quick answer & forward mail.
 # nothing to build
 
 %install
-make install DESTDIR=%{buildroot}/%{_prefix}
+%{make_install}
 desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 
 %files
@@ -64,6 +64,10 @@ fi
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 %changelog
+* Wed Aug 14 2013 Fl@sh <kaperang07@gmail.com> - 2.0.3-1
+- version updated;
+- improved spec & Makefile
+
 * Mon Aug  5 2013 Fl@sh <kaperang07@gmail.com> - 2.0.2-3
 - Summary fixed;
 - release number changed
