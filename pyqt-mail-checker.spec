@@ -1,6 +1,6 @@
 Name: pyqt-mail-checker
-Version: 2.0.2
-Release: 3%{?dist}
+Version: 2.0.3
+Release: 1%{?dist}
 Summary: Applet periodically checking for new messages in the mailboxes
 Summary(ru): Апплет периодически проверяет наличие новых писем в списке почтовых ящиков
 Group: Applications/Internet

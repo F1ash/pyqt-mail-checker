@@ -12,6 +12,6 @@ some improvements;
 fixed spec, __init__-files, binary file name for build;
 VERSION updated;
 
-v.2.0.2:
+v.2.0.3:
 fixed moving MessageStackWidget when it is visible and received new message;
 improved spec & Makefile;
