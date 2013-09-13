@@ -111,7 +111,8 @@ def getMail(obj, m, protocol):
 		#print msg.items()
 		Date		= msg.get('Date')
 		_From		= msg.get('From')
-		From		= mailToString(textChain(_From))
+		#From		= mailToString(textChain(_From))
+		From		= textChain(_From)
 		_Subj		= msg.get('Subject')
 		Subj		= '' if _Subj is None else textChain(_Subj)
 		_From_Subj	= (_From, _Subj)
@@ -257,7 +258,14 @@ class Box(QTabWidget):
 			_data = changeImagePath(data, d['boundary'])
 			''' create temporary html-file '''
 			fileName = os.path.join(self.iconDatabasePath, randomString(24) + '.html')
-			with open(fileName, 'w') as f : f.write(insertMetaData(_data))
+			try :
+				with open(fileName, 'w') as f :
+					f.write(insertMetaData(_data))
+			except Exception, err :
+				print dateStamp(), err
+				with open(fileName, 'w') as f :
+					f.write(str(err))
+			finally : pass 
 			wdg = QWebView()
 			wdg.triggerPageAction(QWebPage.Reload, True)
 			wdg.triggerPageAction(QWebPage.Stop, True)

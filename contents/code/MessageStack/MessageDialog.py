@@ -37,8 +37,8 @@ class MessageDialog(QWidget):
 		self.setWindowTitle(self.tr._translate('M@il Checker : MailView Dialog'))
 		self.setStyleSheet("QWidget {background: rgba(235,240,255,128);}")
 		self.mailList = QLabel(mailList)
-		self.layout = QVBoxLayout(self)
-		self.buttonLayout = QHBoxLayout(self)
+		self.layout = QVBoxLayout()
+		self.buttonLayout = QHBoxLayout()
 		
 		self.ok = QPushButton(QIcon.fromTheme("dialog-ok"), "", self)
 		self.cancel = QPushButton(QIcon.fromTheme("dialog-cancel"), "", self)

@@ -15,3 +15,8 @@ VERSION updated;
 v.2.0.3:
 fixed moving MessageStackWidget when it is visible and received new message;
 improved spec & Makefile;
+
+v.2.0.5:
+fixed creating the temporary html-file ;
+improved the quick answer & forward mailing;
+some fixes;

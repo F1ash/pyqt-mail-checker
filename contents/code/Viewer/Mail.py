@@ -78,6 +78,11 @@ class Mail(QWidget):
 	def linkDisplay(self, s):
 		self.Parent.Parent.statusBar.showMessage(s)
 
+	def getReplyAttributes(self):
+		date = self.dateField.text().split("Date:")[1]
+		sender = self.fromField.text().split("From:")[1]
+		return date, sender
+
 	def sendReMail(self):
 		self.sendMail('Re: ')
 	def sendFwMail(self):
@@ -89,6 +94,16 @@ class Mail(QWidget):
 		elif hasattr(wdg, 'title') : text = wdg.title()
 		else : text = QString('<UNKNOWN_ERROR>')
 		to_ = self._from_subj[0] if self.reply_to is None else self.reply_to
+		# adding auxiliary messages & symbols
+		if prefix.startswith("Re") :
+			chunks = text.split('\n')
+			text = chunks.join('\n> ')
+			text.append('\n')
+			text.prepend('> ')
+			text.prepend("On %s, %s wrote:\n\n" % (self.getReplyAttributes()))
+		elif prefix.startswith("Fw") :
+			text.prepend("Begin forwarded message:\n\n")
+			text.append ("\n\nEnd forwarded message.\n\n")
 		self.sender = MailSender(to_, prefix, self._from_subj[1], text, self)
 		self.sender.exec_()
 

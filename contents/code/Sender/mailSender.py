@@ -153,12 +153,7 @@ class MailSender(QDialog):
 		self.mailField.setUndoRedoEnabled(True)
 		self.mailField.setAutoFormatting(QTextEdit.AutoAll)
 		self.mailField.setReadOnly(not self.Re_Fw)
-		if self.Re_Fw :
-			chunks = text.split('\n')
-			data = chunks.join('\n> ').append('\n').prepend('> ')
-		else :
-			data = self.text
-		self.mailField.setText(data)
+		self.mailField.setPlainText(self.text)
 
 		self.layout = QGridLayout()
 		self.layout.setContentsMargins(0, 0, 0, 0)
@@ -190,7 +185,8 @@ class MailSender(QDialog):
 			'''
 			try :
 				_To = self.toLine.text().toLocal8Bit().data()
-				To = findall(MAILTO_REGEXP, _To)[0]
+				#To = findall(MAILTO_REGEXP, _To)[0]
+				To = _To
 				_From = self.fromLine.text().toLocal8Bit().data()
 				From = findall(MAILTO_REGEXP, _From)[0]
 			except Exception, err :

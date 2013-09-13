@@ -97,7 +97,7 @@ def changeLink(data):
 def insertMetaData(data):
 	res = None
 	insert_after = 0
-	meta = "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n"
+	meta = '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />\n'
 	if not len(data) :
 		return data
 	while data[0] in string.whitespace :
