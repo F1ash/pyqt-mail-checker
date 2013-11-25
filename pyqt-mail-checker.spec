@@ -1,5 +1,5 @@
 Name: pyqt-mail-checker
-Version: 2.0.5
+Version: 2.0.6
 Release: 1%{?dist}
 Summary: Applet periodically checking for new messages in the mailboxes
 Summary(ru): Апплет периодически проверяет наличие новых писем в списке почтовых ящиков
@@ -64,6 +64,9 @@ fi
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 %changelog
+* Mon Nov 25 2013 Fl@sh <kaperang07@gmail.com> - 2.0.6-1
+- version updated;
+
 * Sat Sep 14 2013 Fl@sh <kaperang07@gmail.com> - 2.0.5-1
 - version updated;
 

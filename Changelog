@@ -20,3 +20,6 @@ v.2.0.5:
 fixed creating the temporary html-file ;
 improved the quick answer & forward mailing;
 some fixes;
+
+v.2.0.6:
+improved: cut off the extra work when retrieving IMAP4 mail;

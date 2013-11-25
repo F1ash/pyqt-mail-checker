@@ -369,6 +369,7 @@ def checkNewMailIMAP4(accountData = ['', '']):
 	global ErrorMsg
 	encoding = ''
 	x = ''
+	maxShowedMail = Settings.value('MaxShowedMail', 12).toUInt()[0]
 	try:
 		NewMailAttributes = ''
 		newMailExist = False
@@ -387,19 +388,23 @@ def checkNewMailIMAP4(accountData = ['', '']):
 				countAll = int(answer[1][0])
 				unSeen = countAll - len(m.search(None, 'Seen')[1][0].split())
 				i = countAll
+				_lastElemTime = ''
 				while i > 0 :
 					currentElemTime = getCurrentElemTime(m, i)
 					# print dateStamp(), currentElemTime
 					if currentElemTime > lastElemTime :
-						newMailIds.append(str(i))
-						Date, From, Subj = getMailAttributes(m, i)
-						NewMailAttributes += clearBlank(Date) + '\r\n' + \
-											 clearBlank(From) + '\r\n' + \
-											 clearBlank(Subj) + '\r\n\r\n'
-						#print dateStamp(), NewMailAttributes, '   ----==------'
-						encoding += '\n'
+						if currentElemTime > _lastElemTime :
+							_lastElemTime = currentElemTime
 						newMailExist = newMailExist or True
 						countNew += 1
+						if maxShowedMail >= countAll :
+							newMailIds.append(str(i))
+							Date, From, Subj = getMailAttributes(m, i)
+							NewMailAttributes += clearBlank(Date) + '\r\n' + \
+												 clearBlank(From) + '\r\n' + \
+												 clearBlank(Subj) + '\r\n\r\n'
+							#print dateStamp(), NewMailAttributes, '   ----==------'
+							encoding += '\n'
 					else:
 						break
 					i += -1
@@ -482,9 +487,11 @@ def checkMail(accountData = ['', '']):
 		#print dateStamp(), str(connectMethod),'---'
 		#print dateStamp(), countProbe
 		if str(connectMethod) == 'pop' :
-			return  connectProbe(countProbe, checkNewMailPOP3, [account, accountData[1]], accountData[0])
+			return connectProbe(countProbe, checkNewMailPOP3, \
+				   [account, accountData[1]], accountData[0])
 		elif str(connectMethod) == 'imap' :
-			return connectProbe(countProbe, checkNewMailIMAP4, [account, accountData[1]], accountData[0])
+			return connectProbe(countProbe, checkNewMailIMAP4, \
+				   [account, accountData[1]], accountData[0])
 		else:
 			Msg = 'ConnectMethod Error\n'
 	else:
