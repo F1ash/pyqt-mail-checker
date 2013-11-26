@@ -179,24 +179,26 @@ class IdleMailing(QThread):
 							if currentElemTime > self.lastElemTime :
 								if lastElemTime < currentElemTime :
 									lastElemTime = currentElemTime
+								newMailIds.append(str(i))
 								newMailExist = newMailExist or True
 								countNew += 1
-								if self.maxShowedMail >= countAll :
-									newMailIds.append(str(i))
-									Date, From, Subj = getMailAttributes(self.mail, i)
-									NewMailAttributes += clearBlank(Date) + '\r\n' + \
-														 clearBlank(From) + '\r\n' + \
-														 clearBlank(Subj) + '\r\n\r\n'
-									#print dateStamp(), NewMailAttributes, '   ----==------'
 							else:
 								break
 							i += -1
-						self.lastElemTime = lastElemTime
+						if lastElemTime != '' : self.lastElemTime = lastElemTime
 						# print dateStamp(), self.lastElemTime
 						self.Settings.beginGroup(self.name)
 						self.Settings.setValue('lastElemValue', self.lastElemTime)
 						self.Settings.endGroup()
 						if self.key and newMailExist :
+							if self.maxShowedMail >= len(newMailIds) :
+								for i in newMailIds :
+									Date, From, Subj = getMailAttributes(self.mail, i)
+									NewMailAttributes += clearBlank(Date) + '\r\n' + \
+														 clearBlank(From) + '\r\n' + \
+														 clearBlank(Subj) + '\r\n\r\n'
+									#print dateStamp(), NewMailAttributes, '   ----==------'
+
 							# send data to main thread for change mail data & notify
 							self.prnt.idleThreadMessage.emit({'acc': self.name, 'state': SIGNDATA, \
 															'msg': [countAll, countNew, \

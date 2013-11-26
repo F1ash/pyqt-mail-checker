@@ -199,7 +199,8 @@ def readAccountData(account = ''):
 	authMethod_ = Settings.value('authentificationMethod').toString()
 	connMethod_ = Settings.value('connectMethod').toString()
 	# time.time() for the initiate a time-point of reference
-	last_ = Settings.value('lastElemValue', time.time()).toString()
+	last_ = Settings.value('lastElemValue', time.time()).toUInt()[0]
+	if last_ == 0 : last_ = time.time()
 	enable = Settings.value('Enabled').toString()
 	if connMethod_.startsWith('imap') :
 		inbox = Settings.value('Inbox').toString()
@@ -396,15 +397,8 @@ def checkNewMailIMAP4(accountData = ['', '']):
 						if currentElemTime > _lastElemTime :
 							_lastElemTime = currentElemTime
 						newMailExist = newMailExist or True
+						newMailIds.append(str(i))
 						countNew += 1
-						if maxShowedMail >= countAll :
-							newMailIds.append(str(i))
-							Date, From, Subj = getMailAttributes(m, i)
-							NewMailAttributes += clearBlank(Date) + '\r\n' + \
-												 clearBlank(From) + '\r\n' + \
-												 clearBlank(Subj) + '\r\n\r\n'
-							#print dateStamp(), NewMailAttributes, '   ----==------'
-							encoding += '\n'
 					else:
 						break
 					i += -1
@@ -415,11 +409,19 @@ def checkNewMailIMAP4(accountData = ['', '']):
 			ErrorMsg += '\n' + answer[1]
 
 		if newMailExist :
-			lastElemTime = getCurrentElemTime(m, countAll)
+			if _lastElemTime != '' : lastElemTime = _lastElemTime
 			# print dateStamp(), lastElemTime
 			Settings.beginGroup(accountData[0])
 			Settings.setValue('lastElemValue', lastElemTime)
 			Settings.endGroup()
+			if maxShowedMail >= len(newMailIds) :
+				for i in newMailIds :
+					Date, From, Subj = getMailAttributes(m, i)
+					NewMailAttributes += clearBlank(Date) + '\r\n' + \
+										 clearBlank(From) + '\r\n' + \
+										 clearBlank(Subj) + '\r\n\r\n'
+					#print dateStamp(), NewMailAttributes, '   ----==------'
+					encoding += '\n'
 		else:
 			# print dateStamp(), 'New message(s) not found.'
 			if countAll == 0 :
