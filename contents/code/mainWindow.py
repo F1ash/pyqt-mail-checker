@@ -449,11 +449,11 @@ class MainWindow(QWidget):
 			self.trayIconMenu.addAction(self.trayReloadAction)
 			self.trayIconMenu.addSeparator()
 			self.traySettingsAction = QAction(self.tr._translate("Settings"), self)
-			self.traySettingsAction.setIcon(QIcon.fromTheme("settings"))
+			self.traySettingsAction.setIcon(QIcon.fromTheme("configure"))
 			self.trayIconMenu.addAction(self.traySettingsAction)
 			self.trayIconMenu.addSeparator()
 			self.trayExitAction = QAction(self.tr._translate("Exit"), self)
-			self.trayExitAction.setIcon(QIcon.fromTheme("shutdown"))
+			self.trayExitAction.setIcon(QIcon.fromTheme("application-exit"))
 			self.trayIconMenu.addAction(self.trayExitAction)
 			
 			self.trayVisiblityAction.triggered.connect(self.show_n_hide)
