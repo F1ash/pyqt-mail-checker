@@ -26,3 +26,8 @@ improved: cut off the extra work when retrieving IMAP4 mail;
 
 v.2.0.7:
 some fixes in icon set;
+
+v.2.1.8:
+fixed the poll empty mailbox;
+set app names for correct Phonon work;
+some fixes in icon set;

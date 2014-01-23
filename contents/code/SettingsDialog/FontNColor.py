@@ -122,8 +122,8 @@ class Font_n_Colour(QWidget):
 		self.fieldSubjColourStyle = self.getRGBaStyle(QString(self.fieldSubjColourVar).toUInt())
 		self.fieldDateColourStyle = self.getRGBaStyle(QString(self.fieldDateColourVar).toUInt())
 
-		self.fontIcon = QIcon().fromTheme("font")
-		self.colourIcon = QIcon().fromTheme("color")
+		self.fontIcon = QIcon().fromTheme("preferences-desktop-font")
+		self.colourIcon = QIcon().fromTheme("format-text-color")
 
 		self.init()
 
