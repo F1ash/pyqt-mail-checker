@@ -31,3 +31,7 @@ v.2.1.8:
 fixed the poll empty mailbox;
 set app names for correct Phonon work;
 some fixes in icon set;
+
+v.2.1.10:
+added the check for new mail in IMAP/IDLE;
+fixed close applet to one-click;

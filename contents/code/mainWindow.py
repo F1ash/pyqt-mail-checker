@@ -980,22 +980,21 @@ class MainWindow(QWidget):
 			count = self.initValue('stayDebLog', '5')
 			cleanDebugOutputLogFiles(int(count))
 			self.Settings.sync()
-			print dateStamp() , "MailChecker destroyed manually."
-			#sys.stderr.close()
-			sys.stdout.close()
 			if self.locked : self.unlock()
+			print dateStamp() , "MailChecker destroyed manually."
 			if self.SoundEnabled :
-				self.sound.AppletClosed.finished.connect(self.close)
+				#self.sound.AppletClosed.finished.connect(self.close)
 				self.sound.AppletClosed.play()
 		self.closeFlag = False
+		self.closeEvent(QEvent(QEvent.Close))
 
 	def closeEvent(self, ev):
-		if self.closeFlag and ev.type()==QEvent.Close :
-			ev.ignore()
+		if self.closeFlag :
 			self.eventClose()
-		elif not self.closeFlag and ev.type()==QEvent.Close :
 			ev.accept()
-		else : ev.ignore()
+		#sys.stderr.close()
+		sys.stdout.close()
+		self.close()
 
 	def killMailCheckerThread(self):
 		if hasattr(self, 'T') :
