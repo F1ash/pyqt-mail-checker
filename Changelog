@@ -38,3 +38,7 @@ fixed close applet to one-click;
 
 v.2.1.11:
 fixed the read of account's parameters (issue #10);
+
+v.2.1.12:
+fixed getting the numbers of messages;
+some fixes;

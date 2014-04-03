@@ -38,8 +38,8 @@ class PageDialog(QDialog):
 		self.setWindowTitle(self.tr._translate('M@il Checker : Settings'))
 		self.tabWidget = QTabWidget(self)
 		self.tabWidget.setTabPosition(QTabWidget.North)
-		self.layout = QVBoxLayout(self)
-		self.buttonLayout = QHBoxLayout(self)
+		self.layout = QVBoxLayout()
+		self.buttonLayout = QHBoxLayout()
 		self.ok = QPushButton(QIcon.fromTheme("dialog-ok"), "", self)
 		self.cancel = QPushButton(QIcon.fromTheme("dialog-cancel"), "", self)
 
