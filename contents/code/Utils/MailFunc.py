@@ -51,7 +51,8 @@ def getExternalIP():
 			ip = ip_[0]
 			break
 		except Exception, err:
-			print '[MailFunc in getExternalIP] Error: ', str(err)
+			#print '[MailFunc in getExternalIP] Error: ', str(err)
+			pass
 		finally : pass
 	return ip
 
@@ -179,7 +180,8 @@ def defineUIDL(accountName = '', str_ = ''):
 		f.close()
 		# print dateStamp(), STR
 	except x :
-		print dateStamp(), x, '  defUidl'
+		#print dateStamp(), x, '  defUidl'
+		pass
 	finally :
 		for uid_ in STR :
 			# print dateStamp(), uid_.split('\n')[0] , '--- ', str_
@@ -198,8 +200,8 @@ def readAccountData(account = ''):
 	authMethod_ = Settings.value('authentificationMethod', '').toString()
 	connMethod_ = Settings.value('connectMethod', '').toString()
 	# time.time() for the initiate a time-point of reference
-	last_ = Settings.value('lastElemValue', time.time()).toUInt()[0]
-	if last_ == 0 : last_ = time.time()
+	last_, ok = Settings.value('lastElemValue', time.time()).toUInt()
+	if not ok : last_ = time.time()
 	enable = Settings.value('Enabled', '0').toString()
 	if connMethod_.startsWith('imap') and Settings.contains('Inbox') :
 		inbox = Settings.value('Inbox', '').toString()
@@ -229,7 +231,9 @@ def popAuth(serv, port, login, passw, authMthd):
 		if m.user(login)[:3] == '+OK' :
 			if m.pass_(passw)[:3] == '+OK' :
 				go = True
-	except Exception : pass
+	except Exception :
+		#print dateStamp(), str(err), 'POP3_connect %s:%s' % (serv, port)
+		pass
 	finally : pass
 	return m, go
 
@@ -329,7 +333,7 @@ def getMailAttributes(m, i):
 	return Date, From, Subj
 
 def imapAuth(serv, port, login, passw, authMthd, inbox, idle = False):
-	answer = [None, None]
+	answer = (None, None)
 	m = None
 	loadSocketModule(module = imaplib)
 	if idle : setIdleMethods()
@@ -340,6 +344,7 @@ def imapAuth(serv, port, login, passw, authMthd, inbox, idle = False):
 		else :
 			m = imaplib.IMAP4(serv, port)
 	except Exception, err :
+		#print dateStamp(), str(err), 'IMAP4_connect %s:%s' % (serv, port)
 		return ('', str(err)), m, False
 	tag = m._new_tag()
 	m.send("%s CAPABILITY\r\n" % tag)
@@ -360,6 +365,7 @@ def imapAuth(serv, port, login, passw, authMthd, inbox, idle = False):
 			#print dateStamp(), mailBox, imapUTF7Encode(mailBox)
 			answer = m.select(imapUTF7Encode(mailBox))
 	except Exception, err :
+		#print dateStamp(), str(err), 'IMAP4_login %s:%s' % (serv, port)
 		answer = ('', str(err))
 	finally : pass
 	return answer, m, idleable
@@ -408,7 +414,7 @@ def checkNewMailIMAP4(accountData = ['', '']):
 		else:
 			#print dateStamp(), 'AuthError'
 			probeError, countAll, countNew = False, 0, 0
-			print dateStamp(), answer[1], '  IMAP4_1'
+			#print dateStamp(), answer[1], '  IMAP4_1'
 			ErrorMsg += '\n' + answer[1]
 
 		if newMailExist :
@@ -425,12 +431,6 @@ def checkNewMailIMAP4(accountData = ['', '']):
 										 clearBlank(Subj) + '\r\n\r\n'
 					#print dateStamp(), NewMailAttributes, '   ----==------'
 					encoding += '\n'
-		else:
-			# print dateStamp(), 'New message(s) not found.'
-			if countAll == 0 :
-				Settings.beginGroup(accountData[0])
-				Settings.setValue('lastElemValue', '0')
-				Settings.endGroup()
 
 		if answer[0] == 'OK' :
 			m.close()
@@ -439,7 +439,7 @@ def checkNewMailIMAP4(accountData = ['', '']):
 		Settings.sync()
 
 	except Exception, x :
-		print dateStamp(), x, '  IMAP4'
+		#print dateStamp(), x, '  IMAP4'
 		ErrorMsg += '\n' + unicode(str(x),'UTF-8')
 		probeError = False
 		countAll = 0
@@ -485,7 +485,7 @@ def checkMail(accountData = ['', '']):
 		try:
 			countProbe = int(countProbe_raw.toString())
 		except ValueError:
-			print dateStamp(), '  checkMail'
+			#print dateStamp(), '  checkMail'
 			countProbe = 3
 		finally:
 			pass

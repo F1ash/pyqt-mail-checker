@@ -55,6 +55,7 @@ class IdleMailing(QThread):
 				uid, msg = (None, '')
 				if self.key : uid, msg = self.mail.idle()
 			except Exception, err :
+				#print dateStamp(), str(err), 'IMAP4_IDLE_runIdle1'
 				if not self.restarting : errorCount += 1
 				uid, msg = (None, err)
 			finally : pass
@@ -103,6 +104,7 @@ class IdleMailing(QThread):
 														'msg': [countAll, 0, unSeen, '']})
 				except Exception, err :
 					# send error messasge to main thread
+					#print dateStamp(), str(err), 'IMAP4_IDLE_runIdle2'
 					self.prnt.idleThreadMessage.emit({'acc': self.name, 'state': SIGNERRO, 'msg': err})
 				finally :
 					# successfull probe is clear the errorCount
@@ -126,19 +128,21 @@ class IdleMailing(QThread):
 					# send data to main thread for change mail data
 					self.prnt.idleThreadMessage.emit({'acc': self.name, 'state': SIGNINIT, \
 													'msg': [countAll, new, unSeen, '']})
-				except Exception, err : print dateStamp(), err
+				except Exception, err :
+					#print dateStamp(), str(err), 'IMAP4_IDLE_runIdle3'
+					self.prnt.idleThreadMessage.emit({'acc': self.name, 'state': SIGNERRO, 'msg': err})
 				finally : pass
 			elif not self.key :
-				print dateStamp(), 'key off'
+				#print dateStamp(), 'key off'
 				self.mail.done()
 			# limit of errors shutdown idle thread
 			if errorCount == self.countProbe :
 				self.key = False
-				print dateStamp(), 'errors limit '
+				#print dateStamp(), 'errors limit '
 		#
 		# idle out
 		self.timer.timeout.disconnect(self.restartIdle)
-		print dateStamp(), self.name.toLocal8Bit().data(), 'timer stopped & disconnected'
+		#print dateStamp(), self.name.toLocal8Bit().data(), 'timer stopped & disconnected'
 
 	def setRestartingState(self, state):
 		self.restarting = state
@@ -148,7 +152,9 @@ class IdleMailing(QThread):
 			self.mail.done()
 			self.setRestartingState(True)
 			#print 'restart IDLE'
-		except Exception, err : print dateStamp(), err
+		except Exception, err :
+			#print dateStamp(), err
+			pass
 		finally : pass
 
 	def run(self):
@@ -167,11 +173,12 @@ class IdleMailing(QThread):
 						self.authentificationData[2], self.passw, \
 						self.authentificationData[4], self.authentificationData[8], \
 						True)
+				#print self.answer, self.mail, idleable
 				if idleable :
 					msg = "IDLE mode is available"
 				else :
 					msg = "IDLE mode isn`t available"
-				print dateStamp(), "%s for %s" % (msg, self.name.toLocal8Bit().data())
+				#print dateStamp(), "%s for %s" % (msg, self.name.toLocal8Bit().data())
 				if not idleable :
 					self.key = False
 					# send unavailable notify
@@ -228,15 +235,16 @@ class IdleMailing(QThread):
 																	join(newMailIds, ' ')]})
 						break
 				elif self.answer[0] != 'OK' :
-					print dateStamp(), self.answer[1], '  IMAP4_IDLE'
+					#print dateStamp(), self.answer[1], '  IMAP4_IDLE'
 					# send authentification error notify
 					self.prnt.idleThreadMessage.emit({'acc': self.name, 'state': SIGNERRO, \
 													'msg': [self.answer[1]]})
 			except Exception, err :
-				print dateStamp(), err
+				#print dateStamp(), str(err), 'IMAP4_IDLE_run'
+				pass
 			finally : pass
 
-		print dateStamp(), self.name.toLocal8Bit().data(), 'is runned:', self.runned, '; crypted:', self.authentificationData[4]
+		#print dateStamp(), self.name.toLocal8Bit().data(), 'is runned:', self.runned, '; crypted:', self.authentificationData[4]
 		if self.key and self.runned : self.runIdle()
 		self.key = False
 		self._shutdown()
@@ -245,20 +253,26 @@ class IdleMailing(QThread):
 		self.key = False
 		#print self.key, '<-- key off'
 		try : self.mail.done()
-		except Exception, err : print dateStamp(), err
+		except Exception, err :
+			#print dateStamp(), err
+			pass
 		finally : pass
 
 	def _shutdown(self):
 		if self.answer != [] and self.answer[0] == 'OK' :
 			try : self.mail.close()
-			except Exception, err : print dateStamp(), err
+			except Exception, err :
+				#print dateStamp(), err
+				pass
 			finally : pass
-		print dateStamp(), self.name.toLocal8Bit().data(), 'dir close'
+		#print dateStamp(), self.name.toLocal8Bit().data(), 'dir close'
 		try: self.mail.logout()
-		except Exception, err : print dateStamp(), err
+		except Exception, err :
+			#print dateStamp(), err
+			pass
 		finally : pass
-		print dateStamp(), self.name.toLocal8Bit().data(), 'logout'
-		print dateStamp(), self.name.toLocal8Bit().data(), 'thread stopped'
+		#print dateStamp(), self.name.toLocal8Bit().data(), 'logout'
+		#print dateStamp(), self.name.toLocal8Bit().data(), 'thread stopped'
 		self.emitStoppedSignal()
 
 	def emitStoppedSignal(self):

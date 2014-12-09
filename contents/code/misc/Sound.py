@@ -24,6 +24,7 @@ from PyQt4.phonon import Phonon
 
 class Sound():
 	def __init__(self, parent = None):
+		#print Phonon.BackendCapabilities.availableAudioOutputDevices()
 		self.AppletStarted = Phonon.createPlayer(Phonon.NotificationCategory, \
 				Phonon.MediaSource("/usr/share/sounds/freedesktop/stereo/device-added.oga"))
 

@@ -25,7 +25,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtWebKit import QWebSettings
 from Box import Box
 from Translator import Translator
-from Sound import Sound
+from misc.Sound import Sound
 
 class MainWindow(QMainWindow):
 	jobResult = pyqtSignal(bool)
