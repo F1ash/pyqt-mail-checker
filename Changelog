@@ -42,3 +42,9 @@ fixed the read of account's parameters (issue #10);
 v.2.1.12:
 fixed getting the numbers of messages;
 some fixes;
+
+v.2.1.14:
+fixed Mail Viewer (fixed import Sound);
+changed policy for get new mail:
+    if the data about last message is absent,
+    then get mail since current time;

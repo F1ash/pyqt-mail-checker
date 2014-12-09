@@ -32,4 +32,4 @@ Known issues:
 	If you internet connection is too slow, you need increase time value
 	in "Autoexit of connect" parameter.
 
-Tested Fedora18-19
+Tested Fedora18-21

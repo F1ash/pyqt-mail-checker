@@ -1,5 +1,5 @@
 Name: pyqt-mail-checker
-Version: 2.1.12
+Version: 2.1.14
 Release: 1%{?dist}
 Summary: Applet periodically checking for new messages in the mailboxes
 Summary(ru): Апплет периодически проверяет наличие новых писем в списке почтовых ящиков
@@ -64,60 +64,6 @@ fi
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 %changelog
-* Thu Apr  3 2014 Fl@sh <kaperang07@gmail.com> - 2.1.12-1
+* Tue Dec  9 2014 Fl@sh <kaperang07@gmail.com> - 2.1.14-1
 - version updated;
-
-* Sat Mar 29 2014 Fl@sh <kaperang07@gmail.com> - 2.1.11-1
-- version updated;
-
-* Tue Feb 11 2014 Fl@sh <kaperang07@gmail.com> - 2.1.10-1
-- version updated;
-
-* Thu Jan 23 2014 Fl@sh <kaperang07@gmail.com> - 2.1.8-1
-- version updated;
-
-* Fri Dec 27 2013 Fl@sh <kaperang07@gmail.com> - 2.0.7-1
-- version updated;
-
-* Mon Nov 25 2013 Fl@sh <kaperang07@gmail.com> - 2.0.6-1
-- version updated;
-
-* Sat Sep 14 2013 Fl@sh <kaperang07@gmail.com> - 2.0.5-1
-- version updated;
-
-* Wed Aug 14 2013 Fl@sh <kaperang07@gmail.com> - 2.0.3-1
-- version updated;
-- improved spec & Makefile
-
-* Mon Aug  5 2013 Fl@sh <kaperang07@gmail.com> - 2.0.2-3
-- Summary fixed;
-- release number changed
-
-* Wed Jul 31 2013 Fl@sh <kaperang07@gmail.com> - 2.0.2-2
-- fixed binary file name;
-- release number changed
-
-* Mon Jul 29 2013 Fl@sh <kaperang07@gmail.com> - 2.0.2-1
-- description extended;
-- version updated
-
-* Thu Jul 18 2013 Fl@sh <kaperang07@gmail.com> - 2.0.1-4
-- fixed install tag to macros-style;
-- release number changed
-
-* Wed Jul 17 2013 Fl@sh <kaperang07@gmail.com> - 2.0.1-3
-- added the desktop-file-validate scriptlet;
-- release number changed
-
-* Wed Jul 17 2013 Fl@sh <kaperang07@gmail.com> - 2.0.1-2
-- added the icon-cache-update scriptlet with build require;
-- release number changed
-
-* Fri Jul 12 2013 Fl@sh <kaperang07@gmail.com> - 2.0.1-1
-- version updated
-
-* Tue Jun 11 2013 Fl@sh <kaperang07@gmail.com> - 2.0.0-1
-- version updated
-
-* Wed Apr 24 2013 Fl@sh <kaperang07@gmail.com> - 1.12.55-1
-- Initial build
+- the spec's %%changelog cleared;
