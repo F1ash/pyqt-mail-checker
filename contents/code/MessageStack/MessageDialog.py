@@ -67,7 +67,7 @@ class MessageDialog(QWidget):
 		self.layout.addItem(self.buttonLayout)
 
 		self.setLayout(self.layout)
-		self.setSizePolicy(QSizePolicy(QSizePolicy.PushButton))
+		self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 		self.setMinimumWidth(100)
 
 	def accepted(self):

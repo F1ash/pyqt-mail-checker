@@ -48,7 +48,7 @@ class PageDialog(QDialog):
 		self.layout.addWidget(self.tabWidget)
 		self.layout.addItem(self.buttonLayout)
 		self.setLayout(self.layout)
-		self.setSizePolicy(QSizePolicy(QSizePolicy.PushButton))
+		self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 		self.setMinimumWidth(100)
 		self.ok.clicked.connect(self.accepted)
 		self.cancel.clicked.connect(self.rejected)
