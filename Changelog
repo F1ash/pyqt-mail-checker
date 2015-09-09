@@ -48,3 +48,6 @@ fixed Mail Viewer (fixed import Sound);
 changed policy for get new mail:
     if the data about last message is absent,
     then get mail since current time;
+
+v.2.1.15:
+    fixed RHBZ #1258204;
